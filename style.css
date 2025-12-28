@@ -57,6 +57,7 @@ body {
     height: 100px;
     border-radius: 50%;
     border: 3px solid rgba(255, 255, 255, 0.6);
+    object-fit: cover; 
     transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
 }
 
@@ -192,7 +193,8 @@ h1 {
 /* 卡片网格 */
 .cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    /* 调整了最小宽度，因为现在只有3个卡片，可以让它们稍微宽一点 */
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 20px;
     margin-bottom: 30px;
 }
@@ -234,12 +236,41 @@ h1 {
     opacity: 0.7;
 }
 
-/* 底部 */
+/* 底部区域 */
 footer {
     border-top: 1px solid rgba(255,255,255,0.1);
     padding-top: 20px;
     font-size: 0.8em;
     opacity: 0.8;
+}
+
+/* --- 新增：底部社交小图标样式 --- */
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 15px; /* 与下方时钟的间距 */
+}
+
+.social-links a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%; /* 圆形 */
+    background: rgba(255, 255, 255, 0.1); /* 默认背景很淡 */
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-size: 1.2rem; /* 图标尺寸较小 */
+    transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+    background: var(--accent-color); /* 悬停变粉色 */
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
 #clock {
@@ -263,7 +294,7 @@ footer {
         padding: 25px 15px;
     }
     .cards-grid {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr; /* 3个卡片在手机上一列排开更好看 */
     }
     h1 { font-size: 1.5em; }
     .search-box input { width: 40%; }
