@@ -26,6 +26,7 @@ function selectEngine(engineKey) {
     document.getElementById('current-engine-icon').className = engine.icon;
     document.getElementById('search-input').placeholder = engine.placeholder;
     toggleEngineMenu();
+    // 自动聚焦
     document.getElementById('search-input').focus();
 }
 function doSearch() {
@@ -37,6 +38,7 @@ document.addEventListener('click', function(e) {
     const menu = document.getElementById('engine-options');
     if (!selector.contains(e.target) && menu.classList.contains('show')) menu.classList.remove('show');
 });
+// 兼容性更好的 keydown
 document.getElementById('search-input').addEventListener('keydown', function (e) { if (e.key === 'Enter') doSearch(); });
 
 // 3. 实时时钟 + 问候
@@ -76,9 +78,9 @@ function fetchWeather() {
         });
 }
 
-// 6. 【新增】自动获取 GitHub Star 数
+// 6. 自动获取 GitHub Star 数
 function fetchGithubStars() {
-    // 你的仓库地址是 loong2004/my-nav-page
+    // 你的仓库地址
     fetch('https://api.github.com/repos/loong2004/my-nav-page')
         .then(response => response.json())
         .then(data => {
@@ -100,5 +102,4 @@ setInterval(updateClock, 1000);
 updateClock();
 fetchHitokoto();
 fetchWeather();
-// 启动 Star 获取
 fetchGithubStars();

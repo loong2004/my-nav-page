@@ -57,7 +57,9 @@ body {
     pointer-events: none;
 }
 
+/* 容器设置为相对定位，作为绝对定位元素的参考基准 */
 .container {
+    position: relative;
     width: 90%;
     max-width: 850px;
     background: rgba(10, 10, 20, 0.4);
@@ -217,11 +219,6 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
 }
 
 @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-@media (max-width: 600px) {
-    .container { width: 95%; padding: 30px 20px; }
-    .cards-grid { grid-template-columns: 1fr; }
-    .search-box input { width: 40%; }
-}
 
 .aplayer {
     background: rgba(15, 23, 42, 0.85) !important;
@@ -251,12 +248,16 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
 .aplayer .aplayer-icon { color: #cbd5e1 !important; }
 
 /* =================================================================
-   【新增】GitHub Star 按钮 (Tailwind 复刻版)
+   GitHub Star 按钮 - 战术徽章版 (原生 CSS 复刻)
    ================================================================= */
 .star-btn-container {
+    /* 默认电脑端：绝对定位到右上角 */
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    z-index: 200;
     display: flex;
     justify-content: center;
-    margin-bottom: 20px;
 }
 
 .github-star-btn {
@@ -264,61 +265,56 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
     align-items: center;
     justify-content: center;
     gap: 8px;
-    background-color: #000; /* bg-black */
-    color: #fff; /* text-white */
-    font-size: 0.875rem; /* text-sm */
-    font-weight: 500; /* font-medium */
-    height: 36px; /* h-9 */
-    padding: 0 16px; /* px-4 */
-    border-radius: 6px; /* rounded-md */
+    background-color: #000;
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 500;
+    height: 32px;
+    padding: 0 12px;
+    border-radius: 6px;
     text-decoration: none;
     position: relative;
     overflow: hidden;
     transition: all 0.3s ease-out;
     box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     max-width: 200px;
-    width: 100%;
 }
 
-/* 悬停效果 */
 .github-star-btn:hover {
-    background-color: rgba(0, 0, 0, 0.9); /* hover:bg-black/90 */
-    box-shadow: 0 0 0 2px #000, 0 0 0 4px rgba(0, 0, 0, 0.2); /* ring effect */
+    background-color: rgba(0, 0, 0, 0.9);
+    box-shadow: 0 0 0 2px #000, 0 0 0 4px rgba(0, 0, 0, 0.2);
 }
 
-/* 左侧内容 */
 .btn-left {
     display: flex;
     align-items: center;
 }
 
 .icon-github-logo {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     fill: currentColor;
     margin-right: 4px;
 }
 
-/* 右侧内容 (计数) */
 .btn-right {
     display: flex;
     align-items: center;
     gap: 4px;
     margin-left: 8px;
     padding-left: 8px;
-    border-left: 1px solid rgba(255,255,255,0.2); /* 分割线 */
+    border-left: 1px solid rgba(255,255,255,0.2);
 }
 
 .icon-star-mini {
-    width: 16px;
-    height: 16px;
-    color: #6b7280; /* text-gray-500 */
+    width: 14px;
+    height: 14px;
+    color: #6b7280;
     transition: color 0.3s;
 }
 
-/* 悬停时星星变黄 */
 .github-star-btn:hover .icon-star-mini {
-    color: #fde047; /* text-yellow-300 */
+    color: #fde047;
 }
 
 .star-count {
@@ -326,20 +322,44 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
     font-weight: bold;
 }
 
-/* --- 核心动画：白光扫过 --- */
+/* 扫光动画 */
 .shine-effect {
     position: absolute;
     right: 0;
-    top: -48px; /* -mt-12 */
-    height: 128px; /* h-32 */
-    width: 32px; /* w-8 */
+    top: -48px;
+    height: 128px;
+    width: 32px;
     background-color: #fff;
     opacity: 0.1;
-    transform: translateX(48px) rotate(12deg); /* translate-x-12 rotate-12 */
+    transform: translateX(48px) rotate(12deg);
     transition: all 1s ease-out;
     pointer-events: none;
 }
 
 .github-star-btn:hover .shine-effect {
-    transform: translateX(-200px) rotate(12deg); /* group-hover:-translate-x-40 */
+    transform: translateX(-200px) rotate(12deg);
+}
+
+/* 移动端适配 */
+@media (max-width: 600px) {
+    .container { 
+        width: 95%; 
+        padding: 30px 20px;
+        /* 给顶部多留点空间，因为按钮现在是流式布局 */
+        padding-top: 20px; 
+    }
+    .cards-grid { grid-template-columns: 1fr; }
+    .search-box input { width: 40%; }
+
+    /* 手机上按钮回流到文档流中，居中显示 */
+    .star-btn-container {
+        position: static;
+        margin-bottom: 20px;
+        width: 100%;
+    }
+    
+    .github-star-btn {
+        width: auto;
+        margin: 0 auto;
+    }
 }
