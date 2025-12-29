@@ -11,11 +11,12 @@
     <link rel="preconnect" href="https://npm.elemecdn.com">
     <link rel="preconnect" href="https://cdn.bootcdn.net">
     <link rel="preconnect" href="https://ghchart.rshah.org">
-    <link rel="preconnect" href="https://api.uomg.com">
 
     <link rel="stylesheet" href="https://npm.elemecdn.com/lxgw-wenkai-screen-webfont/style.css" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <link rel="stylesheet" href="https://npm.elemecdn.com/aplayer/dist/APlayer.min.css">
+
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="data:;base64,=">
 </head>
@@ -30,7 +31,6 @@
             </div>
             <h1 id="greeting">你好</h1>
             <p class="hitokoto" id="hitokoto_text">正在建立神经连接...</p>
-            
             <div id="weather-status" class="status-line">LOCATING...</div>
         </header>
 
@@ -86,17 +86,21 @@
         </footer>
     </div>
 
-    <div class="music-widget" id="music-widget" title="点击播放/暂停 (随机动漫歌曲)">
-        <div class="music-visualizer">
-            <span></span><span></span><span></span><span></span>
-        </div>
-        <div class="music-controls">
-            <i class="fas fa-play" id="play-btn" onclick="toggleMusic()"></i>
-        </div>
-        <audio id="bg-music" loop preload="none">
-            <source src="https://api.uomg.com/api/rand.music?sort=动漫&format=mp3" type="audio/mpeg">
-        </audio>
-    </div>
+    <meting-js
+        server="netease"
+        type="playlist"
+        id="24381616"
+        fixed="true"
+        mini="true"
+        order="random"
+        loop="all"
+        preload="auto"
+        list-folded="true"
+        lrc-type="0">
+    </meting-js>
+
+    <script src="https://npm.elemecdn.com/aplayer/dist/APlayer.min.js"></script>
+    <script src="https://npm.elemecdn.com/meting@2/dist/Meting.min.js"></script>
 
     <script src="script.js"></script>
 </body>

@@ -110,7 +110,6 @@ h1 {
     color: #94a3b8;
 }
 
-/* 天气状态栏 */
 .status-line {
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.75rem;
@@ -197,41 +196,6 @@ h1 {
 }
 .gh-chart { max-width: 100%; height: auto; }
 
-/* 音乐挂件 */
-.music-widget {
-    position: fixed; bottom: 30px; right: 30px; width: 50px; height: 160px;
-    background: rgba(15, 23, 42, 0.85); border: 1px solid var(--accent-cyan);
-    border-radius: 25px; backdrop-filter: blur(10px);
-    display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-    padding: 20px 0; z-index: 200; box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
-    transition: all 0.3s;
-}
-.music-widget:hover { box-shadow: 0 0 30px rgba(6, 182, 212, 0.5); transform: translateY(-2px); }
-
-.music-visualizer {
-    display: flex; align-items: flex-end; gap: 4px; height: 40px;
-}
-.music-visualizer span {
-    width: 4px; background: var(--accent-pink); border-radius: 2px;
-    animation: bounce 1s infinite ease-in-out;
-}
-.music-widget.playing .music-visualizer span { animation-play-state: running; }
-.music-widget:not(.playing) .music-visualizer span { height: 4px !important; animation-play-state: paused; transition: height 0.3s; }
-.music-visualizer span:nth-child(1) { animation-duration: 0.8s; }
-.music-visualizer span:nth-child(2) { animation-duration: 1.2s; }
-.music-visualizer span:nth-child(3) { animation-duration: 0.9s; }
-.music-visualizer span:nth-child(4) { animation-duration: 1.1s; }
-
-.music-controls {
-    color: #fff; cursor: pointer; font-size: 1.2rem;
-    width: 36px; height: 36px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    background: rgba(255,255,255,0.1); transition: all 0.3s;
-}
-.music-controls:hover { background: var(--accent-cyan); color: #000; }
-
-@keyframes bounce { 0%, 100% { height: 10%; } 50% { height: 100%; } }
-
 footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; font-size: 0.8rem; color: #64748b; }
 .social-links { display: flex; justify-content: center; gap: 30px; margin-bottom: 25px; }
 .social-links a {
@@ -253,5 +217,73 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
     .container { width: 95%; padding: 30px 20px; }
     .cards-grid { grid-template-columns: 1fr; }
     .search-box input { width: 40%; }
-    .music-widget { right: 10px; bottom: 10px; transform: scale(0.8); }
+}
+
+/* =================================================================
+   【核弹级升级】APlayer 播放器 - 赛博朋克深色磨砂皮肤
+   ================================================================= */
+.aplayer {
+    background: rgba(15, 23, 42, 0.85) !important; /* 深蓝黑背景 */
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid var(--accent-cyan) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.2) !important;
+    color: #e2e8f0 !important;
+    font-family: 'LXGW WenKai Screen', sans-serif !important;
+    margin: 0 !important;
+    z-index: 9999;
+}
+/* 列表部分 */
+.aplayer .aplayer-list ol li {
+    border-top: 1px solid rgba(255,255,255,0.05) !important;
+}
+.aplayer .aplayer-list ol li:hover {
+    background: rgba(6, 182, 212, 0.1) !important;
+}
+.aplayer .aplayer-list ol li.aplayer-list-light {
+    background: rgba(6, 182, 212, 0.2) !important;
+}
+.aplayer .aplayer-list ol li .aplayer-list-title {
+    color: #fff !important;
+}
+.aplayer .aplayer-list ol li .aplayer-list-author {
+    color: #94a3b8 !important;
+}
+/* 播放主体 */
+.aplayer .aplayer-info {
+    border-bottom: none !important;
+}
+.aplayer .aplayer-info .aplayer-music .aplayer-title {
+    color: var(--accent-cyan) !important;
+}
+.aplayer .aplayer-info .aplayer-music .aplayer-author {
+    color: #94a3b8 !important;
+}
+/* 控制按钮 */
+.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-played {
+    background: var(--accent-cyan) !important; /* 进度条颜色 */
+}
+.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-played .aplayer-thumb {
+    background: #fff !important;
+    border: 2px solid var(--accent-cyan) !important;
+}
+/* 歌词 */
+.aplayer .aplayer-lrc:before, .aplayer .aplayer-lrc:after {
+    background: none !important; /* 去掉歌词上下的渐变遮罩 */
+}
+.aplayer .aplayer-lrc p {
+    color: rgba(255,255,255,0.6) !important;
+    text-shadow: none !important;
+}
+.aplayer .aplayer-lrc p.aplayer-lrc-current {
+    color: var(--accent-pink) !important; /* 当前歌词粉色高亮 */
+    font-size: 1.1em !important;
+    font-weight: bold;
+}
+/* 展开按钮 */
+.aplayer .aplayer-body .aplayer-miniswitcher {
+    background: rgba(0,0,0,0.2) !important;
+}
+.aplayer .aplayer-icon {
+    color: #cbd5e1 !important;
 }
