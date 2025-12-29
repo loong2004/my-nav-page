@@ -9,7 +9,6 @@
 
 @font-face {
     font-family: 'DS-Digital';
-    /* 你的文件名是大写 DS-DIGI.TTF，这里必须完全匹配 */
     src: url('./DS-DIGI.TTF') format('truetype');
     font-display: swap;
 }
@@ -180,7 +179,6 @@ h1 {
 .card h3 { font-size: 1.1em; margin-bottom: 5px; font-weight: 700; }
 .card p { font-size: 0.75em; opacity: 0.6; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 1px; }
 
-/* GitHub 概览 */
 .github-section {
     margin-bottom: 30px;
     background: rgba(15, 23, 42, 0.4);
@@ -209,10 +207,8 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
     border-color: rgba(6, 182, 212, 0.3); transform: translateY(-3px); box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
 }
 
-/* 【优化】时钟字体回退 */
 #clock {
     font-size: 3em; 
-    /* 增加 monospace 确保万一字体加载失败，数字宽度也是固定的，不会跳 */
     font-family: 'DS-Digital', monospace, sans-serif; 
     color: var(--accent-cyan);
     text-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
@@ -227,7 +223,6 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
     .search-box input { width: 40%; }
 }
 
-/* APlayer 皮肤 (保持不变) */
 .aplayer {
     background: rgba(15, 23, 42, 0.85) !important;
     backdrop-filter: blur(10px) !important;
@@ -237,7 +232,7 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
     color: #e2e8f0 !important;
     font-family: 'LXGW WenKai Screen', sans-serif !important;
     margin: 0 !important;
-    z-index: 9999; /* 确保层级最高 */
+    z-index: 9999;
 }
 .aplayer .aplayer-list ol li { border-top: 1px solid rgba(255,255,255,0.05) !important; }
 .aplayer .aplayer-list ol li:hover { background: rgba(6, 182, 212, 0.1) !important; }
@@ -254,3 +249,97 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
 .aplayer .aplayer-lrc p.aplayer-lrc-current { color: var(--accent-pink) !important; font-size: 1.1em !important; font-weight: bold; }
 .aplayer .aplayer-body .aplayer-miniswitcher { background: rgba(0,0,0,0.2) !important; }
 .aplayer .aplayer-icon { color: #cbd5e1 !important; }
+
+/* =================================================================
+   【新增】GitHub Star 按钮 (Tailwind 复刻版)
+   ================================================================= */
+.star-btn-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.github-star-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: #000; /* bg-black */
+    color: #fff; /* text-white */
+    font-size: 0.875rem; /* text-sm */
+    font-weight: 500; /* font-medium */
+    height: 36px; /* h-9 */
+    padding: 0 16px; /* px-4 */
+    border-radius: 6px; /* rounded-md */
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease-out;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    max-width: 200px;
+    width: 100%;
+}
+
+/* 悬停效果 */
+.github-star-btn:hover {
+    background-color: rgba(0, 0, 0, 0.9); /* hover:bg-black/90 */
+    box-shadow: 0 0 0 2px #000, 0 0 0 4px rgba(0, 0, 0, 0.2); /* ring effect */
+}
+
+/* 左侧内容 */
+.btn-left {
+    display: flex;
+    align-items: center;
+}
+
+.icon-github-logo {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+    margin-right: 4px;
+}
+
+/* 右侧内容 (计数) */
+.btn-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 8px;
+    padding-left: 8px;
+    border-left: 1px solid rgba(255,255,255,0.2); /* 分割线 */
+}
+
+.icon-star-mini {
+    width: 16px;
+    height: 16px;
+    color: #6b7280; /* text-gray-500 */
+    transition: color 0.3s;
+}
+
+/* 悬停时星星变黄 */
+.github-star-btn:hover .icon-star-mini {
+    color: #fde047; /* text-yellow-300 */
+}
+
+.star-count {
+    font-family: monospace;
+    font-weight: bold;
+}
+
+/* --- 核心动画：白光扫过 --- */
+.shine-effect {
+    position: absolute;
+    right: 0;
+    top: -48px; /* -mt-12 */
+    height: 128px; /* h-32 */
+    width: 32px; /* w-8 */
+    background-color: #fff;
+    opacity: 0.1;
+    transform: translateX(48px) rotate(12deg); /* translate-x-12 rotate-12 */
+    transition: all 1s ease-out;
+    pointer-events: none;
+}
+
+.github-star-btn:hover .shine-effect {
+    transform: translateX(-200px) rotate(12deg); /* group-hover:-translate-x-40 */
+}
