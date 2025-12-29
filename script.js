@@ -26,6 +26,8 @@ function selectEngine(engineKey) {
     document.getElementById('current-engine-icon').className = engine.icon;
     document.getElementById('search-input').placeholder = engine.placeholder;
     toggleEngineMenu();
+    // 【优化】切换引擎后，自动聚焦到输入框，方便直接打字
+    document.getElementById('search-input').focus();
 }
 function doSearch() {
     const query = document.getElementById('search-input').value;
@@ -36,7 +38,8 @@ document.addEventListener('click', function(e) {
     const menu = document.getElementById('engine-options');
     if (!selector.contains(e.target) && menu.classList.contains('show')) menu.classList.remove('show');
 });
-document.getElementById('search-input').addEventListener('keypress', function (e) { if (e.key === 'Enter') doSearch(); });
+// 【优化】使用 keydown 替代 keypress，兼容性更好
+document.getElementById('search-input').addEventListener('keydown', function (e) { if (e.key === 'Enter') doSearch(); });
 
 // 3. 实时时钟 + 问候
 function updateClock() {

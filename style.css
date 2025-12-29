@@ -9,6 +9,7 @@
 
 @font-face {
     font-family: 'DS-Digital';
+    /* 你的文件名是大写 DS-DIGI.TTF，这里必须完全匹配 */
     src: url('./DS-DIGI.TTF') format('truetype');
     font-display: swap;
 }
@@ -207,9 +208,16 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
     background: rgba(6, 182, 212, 0.1); color: var(--accent-cyan);
     border-color: rgba(6, 182, 212, 0.3); transform: translateY(-3px); box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
 }
+
+/* 【优化】时钟字体回退 */
 #clock {
-    font-size: 3em; font-family: 'DS-Digital', sans-serif; color: var(--accent-cyan);
-    text-shadow: 0 0 15px rgba(6, 182, 212, 0.4); letter-spacing: 4px; margin-bottom: 5px;
+    font-size: 3em; 
+    /* 增加 monospace 确保万一字体加载失败，数字宽度也是固定的，不会跳 */
+    font-family: 'DS-Digital', monospace, sans-serif; 
+    color: var(--accent-cyan);
+    text-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+    letter-spacing: 4px;
+    margin-bottom: 5px;
 }
 
 @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
@@ -219,11 +227,9 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
     .search-box input { width: 40%; }
 }
 
-/* =================================================================
-   【核弹级升级】APlayer 播放器 - 赛博朋克深色磨砂皮肤
-   ================================================================= */
+/* APlayer 皮肤 (保持不变) */
 .aplayer {
-    background: rgba(15, 23, 42, 0.85) !important; /* 深蓝黑背景 */
+    background: rgba(15, 23, 42, 0.85) !important;
     backdrop-filter: blur(10px) !important;
     border: 1px solid var(--accent-cyan) !important;
     border-radius: 12px !important;
@@ -231,59 +237,20 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
     color: #e2e8f0 !important;
     font-family: 'LXGW WenKai Screen', sans-serif !important;
     margin: 0 !important;
-    z-index: 9999;
+    z-index: 9999; /* 确保层级最高 */
 }
-/* 列表部分 */
-.aplayer .aplayer-list ol li {
-    border-top: 1px solid rgba(255,255,255,0.05) !important;
-}
-.aplayer .aplayer-list ol li:hover {
-    background: rgba(6, 182, 212, 0.1) !important;
-}
-.aplayer .aplayer-list ol li.aplayer-list-light {
-    background: rgba(6, 182, 212, 0.2) !important;
-}
-.aplayer .aplayer-list ol li .aplayer-list-title {
-    color: #fff !important;
-}
-.aplayer .aplayer-list ol li .aplayer-list-author {
-    color: #94a3b8 !important;
-}
-/* 播放主体 */
-.aplayer .aplayer-info {
-    border-bottom: none !important;
-}
-.aplayer .aplayer-info .aplayer-music .aplayer-title {
-    color: var(--accent-cyan) !important;
-}
-.aplayer .aplayer-info .aplayer-music .aplayer-author {
-    color: #94a3b8 !important;
-}
-/* 控制按钮 */
-.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-played {
-    background: var(--accent-cyan) !important; /* 进度条颜色 */
-}
-.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-played .aplayer-thumb {
-    background: #fff !important;
-    border: 2px solid var(--accent-cyan) !important;
-}
-/* 歌词 */
-.aplayer .aplayer-lrc:before, .aplayer .aplayer-lrc:after {
-    background: none !important; /* 去掉歌词上下的渐变遮罩 */
-}
-.aplayer .aplayer-lrc p {
-    color: rgba(255,255,255,0.6) !important;
-    text-shadow: none !important;
-}
-.aplayer .aplayer-lrc p.aplayer-lrc-current {
-    color: var(--accent-pink) !important; /* 当前歌词粉色高亮 */
-    font-size: 1.1em !important;
-    font-weight: bold;
-}
-/* 展开按钮 */
-.aplayer .aplayer-body .aplayer-miniswitcher {
-    background: rgba(0,0,0,0.2) !important;
-}
-.aplayer .aplayer-icon {
-    color: #cbd5e1 !important;
-}
+.aplayer .aplayer-list ol li { border-top: 1px solid rgba(255,255,255,0.05) !important; }
+.aplayer .aplayer-list ol li:hover { background: rgba(6, 182, 212, 0.1) !important; }
+.aplayer .aplayer-list ol li.aplayer-list-light { background: rgba(6, 182, 212, 0.2) !important; }
+.aplayer .aplayer-list ol li .aplayer-list-title { color: #fff !important; }
+.aplayer .aplayer-list ol li .aplayer-list-author { color: #94a3b8 !important; }
+.aplayer .aplayer-info { border-bottom: none !important; }
+.aplayer .aplayer-info .aplayer-music .aplayer-title { color: var(--accent-cyan) !important; }
+.aplayer .aplayer-info .aplayer-music .aplayer-author { color: #94a3b8 !important; }
+.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-played { background: var(--accent-cyan) !important; }
+.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-played .aplayer-thumb { background: #fff !important; border: 2px solid var(--accent-cyan) !important; }
+.aplayer .aplayer-lrc:before, .aplayer .aplayer-lrc:after { background: none !important; }
+.aplayer .aplayer-lrc p { color: rgba(255,255,255,0.6) !important; text-shadow: none !important; }
+.aplayer .aplayer-lrc p.aplayer-lrc-current { color: var(--accent-pink) !important; font-size: 1.1em !important; font-weight: bold; }
+.aplayer .aplayer-body .aplayer-miniswitcher { background: rgba(0,0,0,0.2) !important; }
+.aplayer .aplayer-icon { color: #cbd5e1 !important; }
