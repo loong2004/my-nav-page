@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://api.paugram.com">
     <link rel="preconnect" href="https://npm.elemecdn.com">
     <link rel="preconnect" href="https://cdn.bootcdn.net">
+    <link rel="preconnect" href="https://ghchart.rshah.org">
+    <link rel="preconnect" href="https://api.uomg.com">
 
     <link rel="stylesheet" href="https://npm.elemecdn.com/lxgw-wenkai-screen-webfont/style.css" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -25,8 +27,10 @@
             <div class="avatar">
                 <img src="./avatar.jpg" alt="Loong Avatar">
             </div>
-            <h1 id="greeting">SYSTEM ONLINE</h1>
+            <h1 id="greeting">你好</h1>
             <p class="hitokoto" id="hitokoto_text">正在建立神经连接...</p>
+            
+            <div id="weather-status" class="status-line">LOADING DATA...</div>
         </header>
 
         <div class="search-box">
@@ -64,6 +68,13 @@
             </a>
         </div>
 
+        <div class="github-section">
+            <div class="section-title"><i class="fab fa-github-alt"></i> COMMIT ACTIVITY</div>
+            <div class="github-graph-container">
+                <img src="https://ghchart.rshah.org/06b6d4/loong2004" alt="GitHub Contributions" class="gh-chart">
+            </div>
+        </div>
+
         <footer>
             <div class="social-links">
                 <a href="https://github.com/loong2004" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
@@ -73,6 +84,19 @@
             <p>&copy; 2025 Loong's Terminal. System Normal.</p>
         </footer>
     </div>
+
+    <div class="music-widget" id="music-widget" title="点击播放/暂停 (随机动漫歌曲)">
+        <div class="music-visualizer">
+            <span></span><span></span><span></span><span></span>
+        </div>
+        <div class="music-controls">
+            <i class="fas fa-play" id="play-btn" onclick="toggleMusic()"></i>
+        </div>
+        <audio id="bg-music" loop preload="none">
+            <source src="https://api.uomg.com/api/rand.music?sort=动漫&format=mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
