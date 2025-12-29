@@ -164,6 +164,7 @@ h1 {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 20px; margin-bottom: 30px;
 }
+/* 卡片恢复为原先的样式 */
 .card {
     background: var(--primary-bg); padding: 25px 15px; border-radius: 12px; text-decoration: none;
     color: #e2e8f0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid transparent;
@@ -199,7 +200,10 @@ h1 {
 
 footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; font-size: 0.8rem; color: #64748b; }
 .social-links { display: flex; justify-content: center; gap: 30px; margin-bottom: 25px; }
+
+/* 底部图标按钮：增加相对定位和overflow隐藏，确保光效不溢出 */
 .social-links a {
+    position: relative; overflow: hidden;
     display: flex; align-items: center; justify-content: center; width: 48px; height: 48px;
     border-radius: 12px; background: rgba(255, 255, 255, 0.05); color: #94a3b8;
     font-size: 1.5rem; transition: all 0.3s ease; border: 1px solid transparent;
@@ -322,7 +326,9 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
     font-weight: bold;
 }
 
-/* 扫光动画 */
+/* =================================================================
+   通用扫光动画 (适用于 按钮、链接)
+   ================================================================= */
 .shine-effect {
     position: absolute;
     right: 0;
@@ -334,10 +340,14 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
     transform: translateX(48px) rotate(12deg);
     transition: all 1s ease-out;
     pointer-events: none;
+    z-index: 10; /* 确保光效在最上层 */
 }
 
-.github-star-btn:hover .shine-effect {
-    transform: translateX(-200px) rotate(12deg);
+/* 触发条件：只保留 GitHub 按钮和社交链接的扫光 */
+.github-star-btn:hover .shine-effect,
+.social-links a:hover .shine-effect {
+    /* 位移距离保持 -500px 即可，足够覆盖这些小按钮 */
+    transform: translateX(-500px) rotate(12deg);
 }
 
 /* 移动端适配 */
