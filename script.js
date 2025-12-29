@@ -63,84 +63,86 @@ function fetchHitokoto() {
         .catch(() => { document.getElementById('hitokoto_text').innerText = "System connected. Ready for input."; });
 }
 
-// 5. 天气 (高德 JS API 优先 -> 心知天气 自动备用)
+
+// 5. 天气 (高德定位 -> 高德天气 -> 心知备用)
 function fetchWeather() {
     const statusDiv = document.getElementById('weather-status');
 
     // 配置信息
     const amapConfig = {
-        key: '02d4bd74cc1897fcb432cc2f77f15098',        // 你的高德 Key
-        securityCode: 'fd70b506e58e5953e91efe72322b9aff', // 你的高德安全密钥
-        cityAdcode: '320100' // 南京
+        key: '02d4bd74cc1897fcb432cc2f77f15098',
+        securityCode: 'fd70b506e58e5953e91efe72322b9aff',
+        defaultCity: '320100' // 南京
     };
-    
+
     // 备用：心知天气配置
     const seniverseConfig = {
-        key: 'SBhWcvdeh-GwBOsHR', // 私钥
-        location: 'nanjing'
+        key: 'SBhWcvdeh-GwBOsHR',
+        location: 'ip' // 心知也支持根据 IP 自动识别
     };
 
-    // --- 策略 A: 尝试高德 JS API (官方推荐前端方案) ---
-    function tryAmap() {
-        // 注入安全密钥 (必须在加载脚本前配置)
-        window._AMapSecurityConfig = {
-            securityJsCode: amapConfig.securityCode,
-        };
+    function startWeatherSystem() {
+        window._AMapSecurityConfig = { securityJsCode: amapConfig.securityCode };
 
-        // 动态加载高德 SDK
         if (typeof AMap === 'undefined') {
             const script = document.createElement('script');
             script.src = `https://webapi.amap.com/maps?v=2.0&key=${amapConfig.key}`;
-            script.onload = runAmapPlugin;
-            script.onerror = trySeniverse; // 加载脚本失败则切备用
+            script.onload = runAmapLogic;
+            script.onerror = trySeniverse;
             document.head.appendChild(script);
         } else {
-            runAmapPlugin();
+            runAmapLogic();
         }
     }
 
-    function runAmapPlugin() {
-        // 使用高德插件查询天气
-        AMap.plugin('AMap.Weather', function() {
+    function runAmapLogic() {
+        // 加载定位插件和天气插件
+        AMap.plugin(['AMap.Geolocation', 'AMap.Weather'], function() {
+            const geolocation = new AMap.Geolocation({
+                enableHighAccuracy: false, // 纯前端 IP 定位不需要高精度
+                timeout: 3000
+            });
             const weather = new AMap.Weather();
-            weather.getLive(amapConfig.cityAdcode, function(err, data) {
-                if (!err && data.info === 'OK') {
-                    // 成功获取: 南京: 晴 25℃
-                    statusDiv.innerText = `${data.city}: ${data.weather} ${data.temperature}℃`;
+
+            // 步骤 1: 获取当前城市定位
+            geolocation.getCityInfo((status, result) => {
+                let targetAdcode = amapConfig.defaultCity;
+                
+                if (status === 'complete' && result.adcode) {
+                    targetAdcode = result.adcode;
+                    console.log("定位成功:", result.city);
                 } else {
-                    console.warn("高德接口报错，切换备用源:", err);
-                    trySeniverse(); // 失败自动切心知
+                    console.warn("定位失败，使用默认城市(南京)");
                 }
+
+                // 步骤 2: 根据定位结果查询天气
+                weather.getLive(targetAdcode, (err, data) => {
+                    if (!err && data.info === 'OK') {
+                        statusDiv.innerText = `${data.city}: ${data.weather} ${data.temperature}℃`;
+                    } else {
+                        trySeniverse();
+                    }
+                });
             });
         });
     }
 
-    // --- 策略 B: 备用方案 (心知天气 V3) ---
     function trySeniverse() {
-        console.log("正在尝试备用天气源...");
-        // 直接使用 fetch 请求
         const url = `https://api.seniverse.com/v3/weather/now.json?key=${seniverseConfig.key}&location=${seniverseConfig.location}&language=zh-Hans&unit=c`;
-
         fetch(url)
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 if (data.results && data.results[0]) {
-                    const now = data.results[0].now;
-                    const location = data.results[0].location;
-                    statusDiv.innerText = `${location.name}: ${now.text} ${now.temperature}℃`;
-                } else {
-                    statusDiv.innerText = "Weather Unavailable";
+                    const res = data.results[0];
+                    statusDiv.innerText = `${res.location.name}: ${res.now.text} ${res.now.temperature}℃`;
                 }
             })
-            .catch(err => {
-                console.error("所有天气接口均失败:", err);
-                statusDiv.innerText = "Weather Offline";
-            });
+            .catch(() => { statusDiv.innerText = "Weather Offline"; });
     }
 
-    // 开始执行
-    tryAmap();
+    startWeatherSystem();
 }
+
 
 // 6. 自动获取 GitHub Star 数
 function fetchGithubStars() {
