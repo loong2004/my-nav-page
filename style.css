@@ -60,13 +60,14 @@ body {
     pointer-events: none;
 }
 
-/* 容器设置为相对定位 */
-/* style.css */
-
+/* =================================================================
+   容器布局 (背景保持宽幅)
+   ================================================================= */
 .container {
     position: relative;
     width: 90%;
-    max-width: 1200px;  /* <--- 仅修改了这里，原为 900px */
+    /* 保持 1200px，确保毛玻璃背景足够大气 */
+    max-width: 1200px;  
     background: rgba(10, 10, 20, 0.4);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -135,6 +136,12 @@ h1 {
     margin-bottom: 30px;
     position: relative;
     z-index: 100;
+    
+    /* --- 核心修改：统一收窄至 850px --- */
+    width: 100%;
+    max-width: 850px; 
+    margin-left: auto;
+    margin-right: auto;
 }
 .search-engine-selector { position: relative; height: 50px; }
 .selected-engine {
@@ -166,40 +173,36 @@ h1 {
 .search-box button:hover { background: #22d3ee; box-shadow: 0 0 15px rgba(6, 182, 212, 0.5); }
 
 /* =================================================================
-   【修正版】卡片布局：强制一行 (Grid 4 Columns)
+   【修正版】卡片布局
+   关键点：限制最大宽度为 850px (从 900px 收窄)，并居中
    ================================================================= */
 .cards-grid {
     display: grid;
-    /* 强制分为 4 列，不再自动换行 */
-    grid-template-columns: repeat(4, 1fr); 
-    gap: 15px; /* 间距稍微调小一点，防止太宽挤下去 */
-    margin-bottom: 30px;
+    /* 保持 auto-fit，确保卡片平铺 */
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 15px; 
+    
+    /* --- 核心修改：收窄至 850px --- */
     width: 100%;
+    max-width: 850px;  
+    margin: 0 auto 30px auto; /* 居中显示，两边自动留白 */
 }
 
 /* =================================================================
-   【修正版】流光跑马灯卡片 (Running Light Border)
-   1. 尺寸缩小，防止排成两行
-   2. 动画改为细长光束旋转，实现“跑马灯”扫过边框的效果
+   流光跑马灯卡片
    ================================================================= */
 .card {
-    /* 基础布局 */
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    
-    /* 【修改】高度减小，更紧凑 */
     height: 140px; 
-    
-    background: #07182E; /* 必须是深色底 */
+    background: #07182E;
     border-radius: 16px;
     overflow: hidden; 
     text-decoration: none; 
     color: #e2e8f0;
-    
-    /* 交互动效 */
     transition: transform 0.3s ease;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
@@ -209,25 +212,14 @@ h1 {
     box-shadow: 0 10px 30px rgba(6, 182, 212, 0.15);
 }
 
-/* --- 【核心修改】跑马灯光束 (::before) --- */
-/* 这里不再是一个大方块，而是一个细长的条，旋转时只有经过边缘才会亮 */
 .card::before {
     content: '';
     position: absolute;
-    
-    /* 宽度设置小一点，形成“光束” */
     width: 80px; 
-    /* 高度拉长，超过卡片对角线长度 */
     height: 160%; 
-    
-    /* 赛博配色渐变 */
     background-image: linear-gradient(180deg, var(--accent-cyan), var(--accent-pink));
-    
-    /* 居中定位 */
     top: 50%;
     left: 50%;
-    
-    /* 动画：以中心为轴旋转 */
     animation: rotBGimg 3s linear infinite;
 }
 
@@ -236,27 +228,22 @@ h1 {
     to   { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-/* --- 遮罩层 (::after) --- */
-/* 用深色背景盖住中间，只露出边缘被光束扫过的地方 */
 .card::after {
     content: '';
     position: absolute;
     background: #07182E; 
-    /* 内缩 3px，这里的 3px 就是流光边框的粗细 */
     inset: 3px; 
     border-radius: 14px; 
 }
 
-/* --- 内容层 --- */
 .card .icon, 
 .card .info {
     position: relative;
-    z-index: 5; /* 确保在遮罩层之上 */
+    z-index: 5; 
 }
 
-/* 图标与文字样式微调 */
 .card .icon {
-    font-size: 2em; /* 稍微调小图标 */
+    font-size: 2em; 
     margin-bottom: 8px;
     color: var(--accent-cyan);
     filter: drop-shadow(0 0 5px rgba(6, 182, 212, 0.4));
@@ -264,7 +251,7 @@ h1 {
 }
 
 .card h3 {
-    font-size: 1em; /* 稍微调小文字 */
+    font-size: 1em; 
     font-weight: 700;
     margin-bottom: 2px;
     color: #fff;
@@ -283,14 +270,22 @@ h1 {
     color: var(--accent-pink);
 }
 
-/* GitHub 概览 */
+/* =================================================================
+   GitHub 概览
+   关键点：同样限制宽度为 850px 并居中
+   ================================================================= */
 .github-section {
-    margin-bottom: 30px;
     background: rgba(15, 23, 42, 0.4);
     border-radius: 12px;
     padding: 15px;
     border: 1px solid var(--glass-border);
+    
+    /* --- 核心修改：收窄至 850px --- */
+    width: 100%;
+    max-width: 850px;
+    margin: 0 auto 30px auto; /* 居中显示 */
 }
+
 .section-title {
     font-size: 0.8rem; color: #94a3b8; margin-bottom: 10px; font-family: 'JetBrains Mono', monospace; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 8px;
 }
@@ -301,10 +296,6 @@ h1 {
 .gh-chart { max-width: 100%; height: auto; }
 
 footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; font-size: 0.8rem; color: #64748b; }
-
-/* 原有的 .social-links 样式已移除，
-   以适应右下角固定布局需求。
-*/
 
 #clock {
     font-size: 3em; 
@@ -345,9 +336,7 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
 .aplayer .aplayer-body .aplayer-miniswitcher { background: rgba(0,0,0,0.2) !important; }
 .aplayer .aplayer-icon { color: #cbd5e1 !important; }
 
-/* =================================================================
-   GitHub Star 按钮 - 右上角悬浮
-   ================================================================= */
+/* GitHub Star 按钮 - 右上角悬浮 */
 .star-btn-container {
     position: absolute;
     top: 30px;
@@ -389,7 +378,6 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
 .github-star-btn:hover .icon-star-mini { color: #fde047; }
 .star-count { font-family: monospace; font-weight: bold; }
 
-/* 按钮的扫光动画 */
 .shine-effect {
     position: absolute;
     right: 0;
@@ -408,18 +396,17 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
 }
 
 /* =================================================================
-   【更新】右下角固定 3D 图标 (参考自 Uiverse.io)
+   右下角固定 3D 图标
    ================================================================= */
 .fixed-links {
     position: fixed;
     bottom: 20px;
     right: 25px;
     display: flex;
-    gap: 15px; /* 图标间距 */
+    gap: 15px; 
     z-index: 1000;
 }
 
-/* .child 对应 */
 .social-btn {
     width: 50px;
     height: 50px;
@@ -430,8 +417,6 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
     transition: all 0.3s cubic-bezier(0.68, 0.85, 0.265, 1.85);
     border-radius: 12px;
     text-decoration: none;
-    
-    /* 默认状态：半透明玻璃态，融合背景 */
     background: rgba(255, 255, 255, 0.05);
     box-shadow: 
         inset 1px 1px 2px rgba(255, 255, 255, 0.1),
@@ -439,39 +424,35 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
     color: rgba(255, 255, 255, 0.5);
 }
 
-/* 悬停效果：翻转底座 */
 .social-btn:hover {
-    background-color: #fff; /* 背景变白，高亮 */
+    background-color: #fff; 
     background-position: -100px 100px, -100px 100px;
     transform: perspective(180px) rotateX(60deg) translateY(2px);
-    color: #000; /* 图标文字变黑 */
+    color: #000; 
 }
 
-/* 针对不同图标的阴影颜色 */
 .child-github:hover {
-    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.8); /* 黑色/深色阴影 */
-    color: #171515; /* GitHub 品牌黑 */
+    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.8);
+    color: #171515; 
 }
 
 .child-email:hover {
-    box-shadow: 0px 10px 10px var(--accent-pink); /* 粉色阴影 */
+    box-shadow: 0px 10px 10px var(--accent-pink); 
     color: var(--accent-pink);
 }
 
-/* .button 对应：里面的图标层 */
 .icon-layer {
     font-size: 24px;
     transition-duration: 0.5s;
     transition-timing-function: cubic-bezier(0.68, -0.85, 0.265, 1.55);
 }
 
-/* 悬停时：图标反向位移+旋转，产生浮空效果 */
 .social-btn:hover > .icon-layer {
     transform: translate3d(0px, 20px, 30px) perspective(80px) rotateX(-60deg) translateY(2px) translateZ(10px);
 }
 
 /* =================================================================
-   【移动端适配】(针对卡片布局调整)
+   移动端适配
    ================================================================= */
 @media (max-width: 600px) {
     .container { 
@@ -480,14 +461,13 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
         padding-top: 20px; 
     }
     
-    /* 手机上卡片强制变成 2 列，防止太挤 */
     .cards-grid { 
+        /* 手机上强制 2 列，宽度限制依然生效但影响不大 */
         grid-template-columns: repeat(2, 1fr); 
     }
     
     .search-box input { width: 40%; }
 
-    /* 手机上按钮回流到文档流中，居中显示 */
     .star-btn-container {
         position: static;
         margin-bottom: 20px;
