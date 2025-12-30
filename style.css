@@ -299,19 +299,10 @@ h1 {
 .gh-chart { max-width: 100%; height: auto; }
 
 footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; font-size: 0.8rem; color: #64748b; }
-.social-links { display: flex; justify-content: center; gap: 30px; margin-bottom: 25px; }
 
-/* 底部图标按钮 */
-.social-links a {
-    position: relative; overflow: hidden;
-    display: flex; align-items: center; justify-content: center; width: 48px; height: 48px;
-    border-radius: 12px; background: rgba(255, 255, 255, 0.05); color: #94a3b8;
-    font-size: 1.5rem; transition: all 0.3s ease; border: 1px solid transparent;
-}
-.social-links a:hover {
-    background: rgba(6, 182, 212, 0.1); color: var(--accent-cyan);
-    border-color: rgba(6, 182, 212, 0.3); transform: translateY(-3px); box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
-}
+/* 原有的 .social-links 样式已移除，
+   以适应右下角固定布局需求。
+*/
 
 #clock {
     font-size: 3em; 
@@ -410,9 +401,31 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
     pointer-events: none;
     z-index: 10;
 }
-.github-star-btn:hover .shine-effect,
-.social-links a:hover .shine-effect {
+.github-star-btn:hover .shine-effect {
     transform: translateX(-500px) rotate(12deg);
+}
+
+/* =================================================================
+   【新】右下角固定极简图标
+   ================================================================= */
+.fixed-links {
+    position: fixed;
+    bottom: 20px;
+    right: 25px;
+    display: flex;
+    gap: 15px;
+    z-index: 1000; /* 确保在背景之上 */
+}
+
+.fixed-links a {
+    color: rgba(255, 255, 255, 0.3); /* 默认半透明灰白色，极简 */
+    font-size: 1.5rem;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.fixed-links a:hover {
+    color: var(--accent-cyan); /* 悬停仅变色，无动效 */
 }
 
 /* =================================================================
