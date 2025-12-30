@@ -173,8 +173,8 @@ h1 {
 .search-box button:hover { background: #22d3ee; box-shadow: 0 0 15px rgba(6, 182, 212, 0.5); }
 
 /* =================================================================
-   【修正版】卡片布局
-   关键点：限制最大宽度为 850px (从 900px 收窄)，并居中
+   卡片布局
+   关键点：限制最大宽度为 850px，并居中
    ================================================================= */
 .cards-grid {
     display: grid;
@@ -272,7 +272,7 @@ h1 {
 
 /* =================================================================
    GitHub 概览
-   关键点：同样限制宽度为 850px 并居中
+   关键点：宽度 850px 居中 + 滤镜增强对比度
    ================================================================= */
 .github-section {
     background: rgba(15, 23, 42, 0.4);
@@ -289,11 +289,33 @@ h1 {
 .section-title {
     font-size: 0.8rem; color: #94a3b8; margin-bottom: 10px; font-family: 'JetBrains Mono', monospace; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 8px;
 }
+
 .github-graph-container {
-    width: 100%; overflow: hidden; display: flex; justify-content: center;
-    opacity: 0.9;
+    width: 100%; 
+    overflow: hidden; 
+    display: flex; 
+    justify-content: center;
+    /* --- 核心修改：移除透明度，避免发灰 --- */
+    opacity: 1; 
 }
-.gh-chart { max-width: 100%; height: auto; }
+
+.gh-chart { 
+    max-width: 100%; 
+    height: auto;
+    
+    /* --- 核心修改：增强滤镜 --- */
+    /* contrast: 提高方块边缘清晰度 */
+    /* saturate: 让青色更鲜艳 */
+    /* brightness: 稍微提亮整体 */
+    filter: contrast(1.5) saturate(1.5) brightness(1.1);
+    
+    transition: filter 0.3s ease;
+}
+
+/* 鼠标悬停时特效 */
+.github-section:hover .gh-chart {
+    filter: contrast(1.6) saturate(1.8) brightness(1.2);
+}
 
 footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; font-size: 0.8rem; color: #64748b; }
 
@@ -462,7 +484,7 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
     }
     
     .cards-grid { 
-        /* 手机上强制 2 列，宽度限制依然生效但影响不大 */
+        /* 手机上强制 2 列 */
         grid-template-columns: repeat(2, 1fr); 
     }
     
