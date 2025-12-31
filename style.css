@@ -330,35 +330,163 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
 
 @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
-/* APlayer 皮肤 */
+/* =================================================================
+   APlayer 赛博朋克战术皮肤 (已重构)
+   ================================================================= */
 .aplayer {
-    background: rgba(15, 23, 42, 0.85) !important;
-    backdrop-filter: blur(10px) !important;
-    border: 1px solid var(--accent-cyan) !important;
-    border-radius: 12px !important;
-    box-shadow: 0 0 20px rgba(6, 182, 212, 0.2) !important;
+    background: rgba(5, 8, 16, 0.95) !important; /* 极深色背景，接近全黑 */
+    backdrop-filter: blur(20px) !important;
+    border: none !important;
+    border-left: 3px solid var(--accent-cyan) !important; /* 左侧能量条 */
+    border-radius: 4px !important; /* 减少圆角，更硬朗 */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), -2px 0 15px rgba(6, 182, 212, 0.2) !important;
     color: #e2e8f0 !important;
-    font-family: 'LXGW WenKai Screen', sans-serif !important;
+    font-family: 'JetBrains Mono', 'DS-Digital', monospace !important; /* 强制终端字体 */
     margin: 0 !important;
     z-index: 9999;
+    max-width: 400px; /* 限制最大宽度，更精致 */
 }
-.aplayer .aplayer-list ol li { border-top: 1px solid rgba(255,255,255,0.05) !important; }
-.aplayer .aplayer-list ol li:hover { background: rgba(6, 182, 212, 0.1) !important; }
-.aplayer .aplayer-list ol li.aplayer-list-light { background: rgba(6, 182, 212, 0.2) !important; }
-.aplayer .aplayer-list ol li .aplayer-list-title { color: #fff !important; }
-.aplayer .aplayer-list ol li .aplayer-list-author { color: #94a3b8 !important; }
-.aplayer .aplayer-info { border-bottom: none !important; }
-.aplayer .aplayer-info .aplayer-music .aplayer-title { color: var(--accent-cyan) !important; }
-.aplayer .aplayer-info .aplayer-music .aplayer-author { color: #94a3b8 !important; }
-.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-played { background: var(--accent-cyan) !important; }
-.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-played .aplayer-thumb { background: #fff !important; border: 2px solid var(--accent-cyan) !important; }
-.aplayer .aplayer-lrc:before, .aplayer .aplayer-lrc:after { background: none !important; }
-.aplayer .aplayer-lrc p { color: rgba(255,255,255,0.6) !important; text-shadow: none !important; }
-.aplayer .aplayer-lrc p.aplayer-lrc-current { color: var(--accent-pink) !important; font-size: 1.1em !important; font-weight: bold; }
-.aplayer .aplayer-body .aplayer-miniswitcher { background: rgba(0,0,0,0.2) !important; }
-.aplayer .aplayer-icon { color: #cbd5e1 !important; }
 
-/* GitHub Star 按钮 - 右上角悬浮 */
+/* 收起状态的小浮窗 */
+.aplayer.aplayer-fixed .aplayer-body {
+    background: rgba(5, 8, 16, 0.95) !important;
+    border: 1px solid rgba(6, 182, 212, 0.3) !important;
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.2) !important;
+}
+
+/* 歌曲列表区域 */
+.aplayer .aplayer-list {
+    border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.aplayer .aplayer-list ol li { 
+    border-top: 1px solid rgba(255,255,255,0.02) !important;
+    transition: all 0.2s ease !important;
+    position: relative;
+}
+
+/* 列表悬停 - 扫描线效果 */
+.aplayer .aplayer-list ol li:hover { 
+    background: linear-gradient(90deg, rgba(6, 182, 212, 0.15), transparent) !important;
+    padding-left: 20px !important; /* 悬停时文字右移 */
+}
+.aplayer .aplayer-list ol li:hover::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent-cyan);
+    box-shadow: 0 0 8px var(--accent-cyan);
+}
+
+/* 当前播放曲目 - 高亮状态 */
+.aplayer .aplayer-list ol li.aplayer-list-light { 
+    background: rgba(6, 182, 212, 0.05) !important; 
+}
+.aplayer .aplayer-list ol li.aplayer-list-light .aplayer-list-title { 
+    color: var(--accent-cyan) !important; 
+    text-shadow: 0 0 5px rgba(6, 182, 212, 0.6);
+}
+.aplayer .aplayer-list ol li.aplayer-list-light .aplayer-list-author { 
+    color: var(--accent-pink) !important; 
+}
+
+/* 文本信息 */
+.aplayer .aplayer-info { 
+    border-bottom: 1px solid rgba(255,255,255,0.05) !important; 
+    padding: 15px 10px !important;
+}
+.aplayer .aplayer-info .aplayer-music .aplayer-title { 
+    color: #fff !important; 
+    font-size: 15px !important;
+    font-weight: bold;
+}
+.aplayer .aplayer-info .aplayer-music .aplayer-author { 
+    color: #64748b !important; 
+    font-size: 12px !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* 进度条 - 激光效果 */
+.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar {
+    height: 4px !important;
+    background: rgba(255,255,255,0.1) !important;
+    border-radius: 2px !important;
+}
+.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-loaded {
+    background: rgba(255,255,255,0.2) !important;
+    height: 4px !important;
+}
+.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-played { 
+    background: linear-gradient(90deg, var(--accent-cyan), var(--accent-pink)) !important; 
+    height: 4px !important;
+    box-shadow: 0 0 10px var(--accent-cyan) !important; /* 进度条发光 */
+    border-radius: 2px !important;
+}
+.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-played .aplayer-thumb { 
+    background: #fff !important; 
+    border: none !important;
+    width: 12px !important;
+    height: 12px !important;
+    box-shadow: 0 0 10px #fff, 0 0 20px var(--accent-pink) !important; /* 拖动点高亮 */
+    margin-top: -4px !important;
+    transform: scale(0.8) !important;
+}
+.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-played .aplayer-thumb:hover {
+    transform: scale(1.2) !important;
+}
+
+/* 歌词区域 */
+.aplayer .aplayer-lrc {
+    text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    margin: 4px 0 !important;
+}
+.aplayer .aplayer-lrc:before, .aplayer .aplayer-lrc:after { 
+    background: none !important; /* 去除原有遮罩 */
+}
+.aplayer .aplayer-lrc p { 
+    color: rgba(255,255,255,0.4) !important; 
+    font-size: 12px !important;
+    font-family: 'LXGW WenKai Screen', sans-serif !important; /* 歌词保持中文手写体 */
+    line-height: 16px !important;
+    opacity: 0.6;
+}
+.aplayer .aplayer-lrc p.aplayer-lrc-current { 
+    color: var(--accent-cyan) !important; 
+    font-size: 14px !important; 
+    font-weight: bold;
+    opacity: 1;
+    text-shadow: 0 0 10px rgba(6, 182, 212, 0.6) !important; /* 当前歌词发光 */
+    transform: scale(1.05);
+    transition: all 0.3s ease;
+}
+
+/* 控制按钮 */
+.aplayer .aplayer-icon { 
+    color: rgba(255,255,255,0.6) !important; 
+    transition: all 0.3s !important;
+}
+.aplayer .aplayer-icon:hover { 
+    color: var(--accent-cyan) !important;
+    filter: drop-shadow(0 0 5px var(--accent-cyan));
+}
+.aplayer .aplayer-icon-menu {
+    display: block !important; /* 强制显示菜单按钮 */
+}
+
+/* 封面图旋转效果 */
+.aplayer .aplayer-pic {
+    border: 2px solid rgba(255,255,255,0.1);
+    transition: border-color 0.3s;
+}
+.aplayer .aplayer-pic:hover {
+    border-color: var(--accent-cyan);
+}
+
+/* =================================================================
+   GitHub Star 按钮 - 右上角悬浮
+   ================================================================= */
 .star-btn-container {
     position: absolute;
     top: 30px;
