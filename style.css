@@ -548,6 +548,9 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
 /* =================================================================
    右下角固定 3D 图标
    ================================================================= */
+/* =================================================================
+   右下角固定图标 (严格引用 Uiverse 原始样式)
+   ================================================================= */
 .fixed-links {
     position: fixed;
     bottom: 20px;
@@ -557,48 +560,65 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
     z-index: 1000;
 }
 
-.social-btn {
-    width: 50px;
-    height: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transform-style: preserve-3d;
-    transition: all 0.3s cubic-bezier(0.68, 0.85, 0.265, 1.85);
-    border-radius: 12px;
-    text-decoration: none;
-    background: rgba(255, 255, 255, 0.05);
-    box-shadow: 
-        inset 1px 1px 2px rgba(255, 255, 255, 0.1),
-        0 0 5px rgba(0, 0, 0, 0.2);
-    color: rgba(255, 255, 255, 0.5);
+/* 按钮基础颜色，确保图标可见 */
+.Btn i {
+    color: #fff;
+    font-size: 1.2rem;
 }
 
-.social-btn:hover {
-    background-color: #fff; 
-    background-position: -100px 100px, -100px 100px;
-    transform: perspective(180px) rotateX(60deg) translateY(2px);
-    color: #000; 
+/* From Uiverse.io by vinodjangid07 */ 
+.Btn {
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background-color: transparent;
+  position: relative;
+  /* overflow: hidden; */
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all .3s;
 }
 
-.child-github:hover {
-    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.8);
-    color: #171515; 
+.svgContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  backdrop-filter: blur(4px);
+  letter-spacing: 0.8px;
+  border-radius: 10px;
+  transition: all .3s;
+  border: 1px solid rgba(156, 156, 156, 0.466);
 }
 
-.child-email:hover {
-    box-shadow: 0px 10px 10px var(--accent-pink); 
-    color: var(--accent-pink);
+.BG {
+  position: absolute;
+  content: "";
+  width: 100%;
+  height: 100%;
+  background: #f09433;
+  background: -moz-linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  background: -webkit-linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
+  background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f09433', endColorstr='#bc1888',GradientType=1 );
+  z-index: -1;
+  border-radius: 9px;
+  pointer-events: none;
+  transition: all .3s;
 }
 
-.icon-layer {
-    font-size: 24px;
-    transition-duration: 0.5s;
-    transition-timing-function: cubic-bezier(0.68, -0.85, 0.265, 1.55);
+.Btn:hover .BG {
+  transform: rotate(35deg);
+  transform-origin: bottom;
 }
 
-.social-btn:hover > .icon-layer {
-    transform: translate3d(0px, 20px, 30px) perspective(80px) rotateX(-60deg) translateY(2px) translateZ(10px);
+.Btn:hover .svgContainer {
+  background-color: rgba(156, 156, 156, 0.466);
 }
 
 /* =================================================================
