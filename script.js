@@ -178,9 +178,21 @@ function fetchWeather() {
 }
 
 
-// 6. 自动获取 GitHub Star 数
+// 6. 自动获取 GitHub Star 数（加缓存和错误处理）
 function fetchGithubStars() {
     const starCountElem = document.getElementById('github-star-count');
+    const CACHE_KEY = 'gh_stars_cache';
+    const CACHE_TIME = 3600000; // 1小时
+    
+    // 检查缓存
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+        const { stars, time } = JSON.parse(cached);
+        if (Date.now() - time < CACHE_TIME) {
+            starCountElem.innerText = stars;
+            return;
+        }
+    }
     
     fetch('https://api.github.com/repos/loong2004/my-nav-page')
         .then(response => {
@@ -194,7 +206,10 @@ function fetchGithubStars() {
         })
         .then(data => {
             if (data.stargazers_count !== undefined) {
-                starCountElem.innerText = data.stargazers_count;
+                const stars = data.stargazers_count;
+                starCountElem.innerText = stars;
+                // 缓存结果
+                localStorage.setItem(CACHE_KEY, JSON.stringify({ stars, time: Date.now() }));
             } else {
                 starCountElem.innerText = "-";
             }
@@ -325,15 +340,13 @@ function checkNetworkStatus() {
 document.addEventListener('DOMContentLoaded', function() {
     const loader = document.getElementById('preloader');
     
-    // 300ms 极短缓冲，仅为了平滑过渡，消除 1.5s 的人为卡顿
-    setTimeout(function() {
-        loader.classList.add('hidden');
-        
-        // 动画结束后彻底移除元素，释放内存
-        setTimeout(() => {
-            loader.style.display = 'none';
-        }, 500); 
-    }, 300); 
+    // 立即隐藏，无额外延迟
+    loader.classList.add('hidden');
+    
+    // 动画结束后彻底移除元素，释放内存
+    setTimeout(() => {
+        loader.style.display = 'none';
+    }, 500); 
 });
 
 // 兜底策略：以防 DOMContentLoaded 未触发
