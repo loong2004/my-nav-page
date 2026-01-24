@@ -33,6 +33,7 @@
     * **GitHub Activity**：集成 `ghchart` 渲染提交热力图
     * **GitHub Star**：右上角实时显示项目 Star 数量
     * **Smart Search**：集成 Google, Baidu, Bing, DuckDuckGo，支持点击切换引擎与 Tab/Enter 快捷键
+    * **Keyboard Friendly**：搜索引擎选择器支持键盘操作（Enter/Space/ESC），更易用
     * **Time-based Greeting**：根据当前系统时间自动切换问候语
     * **Quick Links**：快捷导航卡片（博客、影院、图床、热点）
     * **Network Monitor**：实时监控多站点（字节、B站、微信、淘宝、GitHub、jsDelivr、Cloudflare、YouTube）连通性，带信号灯可视化
@@ -40,6 +41,9 @@
     * `DNS-Prefetch` & `Preconnect` 预连接高德、GitHub 等关键 API 域名
     * 所有第三方库均走国内高速 CDN 镜像
     * 资源预加载优化，300ms 极速启动
+* **♿ 可访问性 (Accessibility)**
+    * 搜索引擎菜单与按钮提供 `aria` 属性与焦点可见样式
+    * 支持系统“减少动态效果”偏好
 
 ## 📂 项目结构 (Structure)
 
@@ -99,6 +103,11 @@ const seniverseConfig = {
     ...
 </div>
 ```
+
+## ✅ 建议 (Best Practice)
+
+* 如需进一步优化首屏加载，可将背景图替换为本地资源或自建 CDN。
+* 若对隐私更敏感，可在公网部署时替换天气/定位与第三方 API。
 
 ## 🚀 部署指南 (Deployment)
 

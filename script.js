@@ -33,7 +33,32 @@ const engineKeys = Object.keys(searchEngines);
 let currentEngineIndex = 2; // 默认 Bing (索引2)
 let currentEngine = engineKeys[currentEngineIndex];
 
-function toggleEngineMenu() { document.getElementById('engine-options').classList.toggle('show'); }
+const engineSelector = document.getElementById('engine-selector');
+const engineOptions = document.getElementById('engine-options');
+const selectedEngineButton = document.getElementById('selected-engine');
+const searchInput = document.getElementById('search-input');
+const searchButton = document.getElementById('search-btn');
+const engineOptionButtons = engineOptions ? Array.from(engineOptions.querySelectorAll('.option')) : [];
+
+function setEngineMenuState(isOpen) {
+    if (!engineOptions || !selectedEngineButton) return;
+    engineOptions.classList.toggle('show', isOpen);
+    selectedEngineButton.setAttribute('aria-expanded', String(isOpen));
+    engineOptions.setAttribute('aria-hidden', String(!isOpen));
+}
+
+function toggleEngineMenu() {
+    if (!engineOptions) return;
+    const willOpen = !engineOptions.classList.contains('show');
+    setEngineMenuState(willOpen);
+    if (willOpen && engineOptionButtons.length > 0) engineOptionButtons[0].focus();
+}
+
+function closeEngineMenu() {
+    if (engineOptions && engineOptions.classList.contains('show')) {
+        setEngineMenuState(false);
+    }
+}
 
 function selectEngine(engineKey) {
     if (!searchEngines[engineKey]) return;
@@ -45,38 +70,77 @@ function selectEngine(engineKey) {
     // 更新 UI
     const engine = searchEngines[engineKey];
     document.getElementById('current-engine-icon').className = engine.icon;
-    const input = document.getElementById('search-input');
-    input.placeholder = engine.placeholder;
-    
+    if (searchInput) searchInput.placeholder = engine.placeholder;
+
     // 关闭菜单并聚焦
-    const menu = document.getElementById('engine-options');
-    if (menu.classList.contains('show')) menu.classList.remove('show');
-    input.focus();
+    closeEngineMenu();
+    if (searchInput) searchInput.focus();
 }
 
 function doSearch() {
-    const query = document.getElementById('search-input').value;
-    if (query) window.open(searchEngines[currentEngine].url + encodeURIComponent(query), '_blank');
+    if (!searchInput) return;
+    const query = searchInput.value.trim();
+    if (query) {
+        window.open(searchEngines[currentEngine].url + encodeURIComponent(query), '_blank');
+    } else {
+        searchInput.focus();
+    }
 }
 
 // 点击外部关闭菜单
 document.addEventListener('click', function(e) {
-    const selector = document.getElementById('engine-selector');
-    const menu = document.getElementById('engine-options');
-    if (!selector.contains(e.target) && menu.classList.contains('show')) menu.classList.remove('show');
+    if (!engineSelector) return;
+    if (!engineSelector.contains(e.target)) closeEngineMenu();
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeEngineMenu();
 });
 
 // 键盘事件监听 (Enter 搜索, Tab 切换)
-document.getElementById('search-input').addEventListener('keydown', function (e) { 
-    if (e.key === 'Enter') {
-        doSearch();
-    } else if (e.key === 'Tab') {
-        e.preventDefault(); // 阻止默认的切出焦点行为
-        // 循环切换索引
-        currentEngineIndex = (currentEngineIndex + 1) % engineKeys.length;
-        selectEngine(engineKeys[currentEngineIndex]);
-    }
+if (selectedEngineButton) {
+    selectedEngineButton.addEventListener('click', function(e) {
+        e.stopPropagation();
+        toggleEngineMenu();
+    });
+    selectedEngineButton.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleEngineMenu();
+        }
+    });
+}
+
+engineOptionButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+        const key = btn.getAttribute('data-engine');
+        if (key) selectEngine(key);
+    });
+    btn.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            const key = btn.getAttribute('data-engine');
+            if (key) selectEngine(key);
+        }
+    });
 });
+
+if (searchButton) {
+    searchButton.addEventListener('click', doSearch);
+}
+
+if (searchInput) {
+    searchInput.addEventListener('keydown', function (e) { 
+        if (e.key === 'Enter') {
+            doSearch();
+        } else if (e.key === 'Tab') {
+            e.preventDefault(); // 阻止默认的切出焦点行为
+            // 循环切换索引
+            currentEngineIndex = (currentEngineIndex + 1) % engineKeys.length;
+            selectEngine(engineKeys[currentEngineIndex]);
+        }
+    });
+}
 
 // 3. 实时时钟 + 问候
 function updateClock() {
@@ -360,6 +424,7 @@ window.addEventListener('load', function() {
 
 // 初始化
 setFixedBackground(); // 改名调用新函数：设置固定背景
+selectEngine(currentEngine);
 setInterval(updateClock, 1000);
 updateClock();
 fetchHitokoto();

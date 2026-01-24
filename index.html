@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Loong's Personal Portal - A Cyberpunk Dashboard">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="color-scheme" content="dark">
     
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://nav.885123.xyz/">
@@ -17,6 +19,7 @@
     <link rel="preconnect" href="https://npm.elemecdn.com">
     <link rel="preconnect" href="https://cdn.bootcdn.net">
     <link rel="preconnect" href="https://ghchart.rshah.org">
+    <link rel="preconnect" href="https://images.unsplash.com">
 
     <!-- 优雅中文字体：使用 LXGW WenKai Lite 轻量版 -->
     <link rel="stylesheet" href="https://npm.elemecdn.com/lxgw-wenkai-lite-webfont@1.1.0/style.css">
@@ -122,24 +125,24 @@
                 <img src="./avatar.jpg" alt="Loong Avatar">
             </div>
             <h1 id="greeting">你好</h1>
-            <p class="hitokoto" id="hitokoto_text">正在建立神经连接...</p>
-            <div id="weather-status" class="status-line">LOCATING...</div>
+            <p class="hitokoto" id="hitokoto_text" aria-live="polite">正在建立神经连接...</p>
+            <div id="weather-status" class="status-line" aria-live="polite">LOCATING...</div>
         </header>
 
         <div class="search-box">
             <div class="search-engine-selector" id="engine-selector">
-                <div class="selected-engine" onclick="toggleEngineMenu()">
+                <div class="selected-engine" id="selected-engine" role="button" tabindex="0" aria-label="选择搜索引擎" aria-expanded="false" aria-controls="engine-options">
                     <i class="fab fa-microsoft" id="current-engine-icon"></i>
                 </div>
-                <div class="engine-options" id="engine-options">
-                    <div class="option" onclick="selectEngine('google')"><i class="fab fa-google"></i> <span>Google</span></div>
-                    <div class="option" onclick="selectEngine('baidu')"><i class="fas fa-paw"></i> <span>Baidu</span></div>
-                    <div class="option" onclick="selectEngine('bing')"><i class="fab fa-microsoft"></i> <span>Bing</span></div>
-                    <div class="option" onclick="selectEngine('duckduckgo')"><i class="fas fa-shield-alt"></i> <span>DuckDuckGo</span></div>
+                <div class="engine-options" id="engine-options" role="menu" aria-hidden="true">
+                    <div class="option" role="menuitem" tabindex="0" data-engine="google"><i class="fab fa-google"></i> <span>Google</span></div>
+                    <div class="option" role="menuitem" tabindex="0" data-engine="baidu"><i class="fas fa-paw"></i> <span>Baidu</span></div>
+                    <div class="option" role="menuitem" tabindex="0" data-engine="bing"><i class="fab fa-microsoft"></i> <span>Bing</span></div>
+                    <div class="option" role="menuitem" tabindex="0" data-engine="duckduckgo"><i class="fas fa-shield-alt"></i> <span>DuckDuckGo</span></div>
                 </div>
             </div>
-            <input type="text" id="search-input" placeholder="Enter Command..." autofocus>
-            <button onclick="doSearch()"><i class="fas fa-search"></i></button>
+            <input type="text" id="search-input" placeholder="Enter Command..." autofocus autocomplete="off" spellcheck="false" aria-label="搜索关键词">
+            <button id="search-btn" type="button" aria-label="搜索"><i class="fas fa-search"></i></button>
         </div>
 
         <div class="cards-grid">

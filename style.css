@@ -26,6 +26,26 @@
     font-family: 'LXGW WenKai Lite', 'LXGW WenKai', 'Segoe UI', 'Microsoft YaHei', sans-serif;
 }
 
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+.selected-engine:focus-visible,
+.option:focus-visible,
+.Btn:focus-visible,
+.github-star-btn:focus-visible {
+    outline: 2px solid var(--accent-cyan);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
 body {
     height: 100vh;
     display: flex;
