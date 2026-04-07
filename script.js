@@ -40,6 +40,39 @@ const searchInput = document.getElementById('search-input');
 const searchButton = document.getElementById('search-btn');
 const engineOptionButtons = engineOptions ? Array.from(engineOptions.querySelectorAll('.option')) : [];
 
+function fetchWithTimeout(url, options = {}, timeout = 5000) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    return fetch(url, { ...options, signal: controller.signal })
+        .finally(() => clearTimeout(timeoutId));
+}
+
+async function fetchJsonWithRetry(url, options = {}, config = {}) {
+    const timeout = config.timeout ?? 5000;
+    const retries = config.retries ?? 1;
+    const retryDelay = config.retryDelay ?? 300;
+
+    let lastError;
+    for (let attempt = 0; attempt <= retries; attempt++) {
+        try {
+            const response = await fetchWithTimeout(url, options, timeout);
+            if (!response.ok) {
+                const error = new Error(`HTTP_${response.status}`);
+                error.status = response.status;
+                throw error;
+            }
+            return await response.json();
+        } catch (error) {
+            lastError = error;
+            if (attempt < retries) {
+                await new Promise(resolve => setTimeout(resolve, retryDelay));
+            }
+        }
+    }
+    throw lastError;
+}
+
 function setEngineMenuState(isOpen) {
     if (!engineOptions || !selectedEngineButton) return;
     engineOptions.classList.toggle('show', isOpen);
@@ -160,8 +193,7 @@ function updateClock() {
 
 // 4. 一言 API
 function fetchHitokoto() {
-    fetch('https://v1.hitokoto.cn/?c=a&c=b')
-        .then(response => response.json())
+    fetchJsonWithRetry('https://v1.hitokoto.cn/?c=a&c=b', {}, { timeout: 3500, retries: 1, retryDelay: 250 })
         .then(data => { document.getElementById('hitokoto_text').innerText = `${data.hitokoto} —— ${data.from}`; })
         .catch(() => { document.getElementById('hitokoto_text').innerText = "System connected. Ready for input."; });
 }
@@ -170,6 +202,15 @@ function fetchHitokoto() {
 // 5. 天气 (高德定位 -> 高德天气 -> 心知备用)
 function fetchWeather() {
     const statusDiv = document.getElementById('weather-status');
+    if (!statusDiv) return;
+
+    let weatherResolved = false;
+
+    function finalizeWeather(text) {
+        if (weatherResolved) return;
+        weatherResolved = true;
+        statusDiv.innerText = text;
+    }
 
     const amapConfig = {
         key: '02d4bd74cc1897fcb432cc2f77f15098',
@@ -197,6 +238,10 @@ function fetchWeather() {
     }
 
     function runAmapLogic() {
+        setTimeout(() => {
+            if (!weatherResolved) trySeniverse();
+        }, 5000);
+
         AMap.plugin(['AMap.Geolocation', 'AMap.Weather'], function() {
             const geolocation = new AMap.Geolocation({
                 enableHighAccuracy: false,
@@ -215,7 +260,7 @@ function fetchWeather() {
 
                 weather.getLive(targetAdcode, (err, data) => {
                     if (!err && data.info === 'OK') {
-                        statusDiv.innerText = `${data.city}: ${data.weather} ${data.temperature}℃`;
+                        finalizeWeather(`${data.city}: ${data.weather} ${data.temperature}℃`);
                     } else {
                         trySeniverse();
                     }
@@ -225,19 +270,19 @@ function fetchWeather() {
     }
 
     function trySeniverse() {
+        if (weatherResolved) return;
         console.log("Switching to Seniverse Weather...");
         const url = `https://api.seniverse.com/v3/weather/now.json?key=${seniverseConfig.key}&location=${seniverseConfig.location}&language=zh-Hans&unit=c`;
-        fetch(url)
-            .then(res => res.json())
+        fetchJsonWithRetry(url, {}, { timeout: 4000, retries: 1, retryDelay: 300 })
             .then(data => {
                 if (data.results && data.results[0]) {
                     const res = data.results[0];
-                    statusDiv.innerText = `${res.location.name}: ${res.now.text} ${res.now.temperature}℃`;
+                    finalizeWeather(`${res.location.name}: ${res.now.text} ${res.now.temperature}℃`);
                 } else {
-                    statusDiv.innerText = "Weather Offline";
+                    finalizeWeather("Weather Offline");
                 }
             })
-            .catch(() => { statusDiv.innerText = "Weather Offline"; });
+            .catch(() => { finalizeWeather("Weather Offline"); });
     }
 
     startWeatherSystem();
@@ -247,6 +292,7 @@ function fetchWeather() {
 // 6. 自动获取 GitHub Star 数（加缓存和错误处理）
 function fetchGithubStars() {
     const starCountElem = document.getElementById('github-star-count');
+    if (!starCountElem) return;
     const CACHE_KEY = 'gh_stars_cache';
     const CACHE_TIME = 3600000; // 1小时
     
@@ -264,13 +310,17 @@ function fetchGithubStars() {
         }
     }
     
-    fetch('https://api.github.com/repos/loong2004/my-nav-page')
+    fetchWithTimeout('https://api.github.com/repos/loong2004/my-nav-page', {}, 4500)
         .then(response => {
             if (response.status === 403 || response.status === 429) {
-                throw new Error("Rate Limit Exceeded");
+                const err = new Error("RATE_LIMIT");
+                err.status = response.status;
+                throw err;
             }
             if (!response.ok) {
-                throw new Error("Network response was not ok");
+                const err = new Error(`HTTP_${response.status}`);
+                err.status = response.status;
+                throw err;
             }
             return response.json();
         })
@@ -287,7 +337,16 @@ function fetchGithubStars() {
         .catch(err => {
             console.warn("GitHub Star fetch failed:", err.message);
             starCountElem.innerText = "N/A";
-            starCountElem.title = "GitHub API Rate Limit or Network Error";
+
+            if (err.name === 'AbortError') {
+                starCountElem.title = "GitHub API Timeout";
+            } else if (err.message === 'RATE_LIMIT') {
+                starCountElem.title = "GitHub API Rate Limit";
+            } else if (err.message && err.message.startsWith('HTTP_')) {
+                starCountElem.title = `GitHub API Error (${err.message.replace('HTTP_', '')})`;
+            } else {
+                starCountElem.title = "GitHub API Network Error";
+            }
         });
 }
 
@@ -361,30 +420,39 @@ function checkNetworkStatus() {
         const dotsElem = document.getElementById(`status-${target.id}`);
         if (!textElem || !dotsElem) return;
 
-        const start = performance.now();
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3000); // 3秒超时
+        const onePing = async () => {
+            const start = performance.now();
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 3000); // 3秒超时
+
+            try {
+                // mode: 'no-cors' 是必须的，cache: 'no-store' 加上时间戳强制不缓存
+                await fetch(`${target.url}?t=${Date.now()}`, {
+                    mode: 'no-cors',
+                    cache: 'no-store',
+                    signal: controller.signal
+                });
+                const end = performance.now();
+                const jitter = Math.floor(Math.random() * 5);
+                return Math.round(end - start) + jitter;
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        };
 
         try {
-            // mode: 'no-cors' 是必须的，cache: 'no-store' 加上时间戳强制不缓存
-            await fetch(`${target.url}?t=${Date.now()}`, { 
-                mode: 'no-cors', 
-                cache: 'no-store',
-                signal: controller.signal 
-            });
-            
-            clearTimeout(timeoutId);
-            const end = performance.now();
-            // 增加随机抖动(0-5ms)，模拟真实波动
-            const jitter = Math.floor(Math.random() * 5); 
-            const latency = Math.round(end - start) + jitter;
+            let latency;
+            try {
+                latency = await onePing();
+            } catch {
+                latency = await onePing(); // 轻量重试一次
+            }
 
-            textElem.innerText = `~${latency}ms`;
+            textElem.innerText = `${latency}ms`;
             textElem.title = 'Estimated latency';
             const color = renderStatusDots(latency, dotsElem);
             textElem.className = `net-latency text-${color}`;
-
-        } catch (error) {
+        } catch {
             textElem.innerText = 'OFF';
             textElem.className = 'net-latency text-red';
             textElem.title = 'Connectivity unavailable';
