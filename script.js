@@ -1,23 +1,53 @@
-// 1. 背景设置 (优化版：改为固定高速 CDN 壁纸，提升加载速度)
+// 1. 背景设置 (每次刷新随机 + 大陆优先 + 加载失败兜底)
 function setFixedBackground() {
-    // 选用了一张深色系、科技感强的“地球网络”壁纸，非常契合“终端”主题
-    // 使用 Unsplash 的 auto=format (WebP) 和 q=80 参数进行极致压缩
-    const bgUrl = "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1920&auto=format&fit=crop";
-    
     const background = document.querySelector('.background');
-    const img = new Image();
-    
-    // 预加载逻辑：图片加载成功后才替换背景，避免闪屏
-    img.src = bgUrl;
-    img.onload = function() {
-        background.style.backgroundImage = `url('${bgUrl}')`;
-        background.style.opacity = '1'; // 确保 CSS 中如果有 opacity 过渡能生效
-    };
-    
-    // 兜底：如果图片加载极快或缓存了，直接显示
-    if (img.complete) {
-        background.style.backgroundImage = `url('${bgUrl}')`;
+    if (!background) return;
+
+    // 首选国内可访问随机源，刷新时附加随机参数规避缓存
+    const randomSources = [
+        'https://api.paugram.com/wallpaper/?source=sm',
+        'https://api.paugram.com/wallpaper/?source=gh',
+        'https://api.paugram.com/wallpaper/?source=360'
+    ];
+
+    // 随机源异常时的静态兜底，保证始终有背景
+    const fallbackSources = [
+        'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1920&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1920&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?q=80&w=1920&auto=format&fit=crop'
+    ];
+
+    const pickOne = (arr) => arr[Math.floor(Math.random() * arr.length)];
+    const cacheBuster = `t=${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const randomEndpoint = pickOne(randomSources);
+    const primaryUrl = `${randomEndpoint}${randomEndpoint.includes('?') ? '&' : '?'}${cacheBuster}`;
+    const fallbackUrl = pickOne(fallbackSources);
+
+    function preloadAndApply(url, onError) {
+        const img = new Image();
+        img.src = url;
+
+        img.onload = function() {
+            background.style.backgroundImage = `url('${url}')`;
+            background.style.opacity = '1';
+        };
+
+        img.onerror = function() {
+            if (typeof onError === 'function') onError();
+        };
+
+        if (img.complete && img.naturalWidth > 0) {
+            background.style.backgroundImage = `url('${url}')`;
+            background.style.opacity = '1';
+        }
     }
+
+    preloadAndApply(primaryUrl, function() {
+        preloadAndApply(fallbackUrl, function() {
+            background.style.backgroundImage = 'linear-gradient(120deg, #0f172a 0%, #1e293b 55%, #0b1120 100%)';
+            background.style.opacity = '1';
+        });
+    });
 }
 
 // 2. 搜索配置 (Tab 键循环切换)
