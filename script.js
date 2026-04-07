@@ -133,8 +133,8 @@ if (searchInput) {
     searchInput.addEventListener('keydown', function (e) { 
         if (e.key === 'Enter') {
             doSearch();
-        } else if (e.key === 'Tab') {
-            e.preventDefault(); // 阻止默认的切出焦点行为
+        } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+            e.preventDefault(); // 保留 Tab 的原生焦点切换，改为方向键切换引擎
             // 循环切换索引
             currentEngineIndex = (currentEngineIndex + 1) % engineKeys.length;
             selectEngine(engineKeys[currentEngineIndex]);
@@ -233,6 +233,8 @@ function fetchWeather() {
                 if (data.results && data.results[0]) {
                     const res = data.results[0];
                     statusDiv.innerText = `${res.location.name}: ${res.now.text} ${res.now.temperature}℃`;
+                } else {
+                    statusDiv.innerText = "Weather Offline";
                 }
             })
             .catch(() => { statusDiv.innerText = "Weather Offline"; });
@@ -251,10 +253,14 @@ function fetchGithubStars() {
     // 检查缓存
     const cached = localStorage.getItem(CACHE_KEY);
     if (cached) {
-        const { stars, time } = JSON.parse(cached);
-        if (Date.now() - time < CACHE_TIME) {
-            starCountElem.innerText = stars;
-            return;
+        try {
+            const { stars, time } = JSON.parse(cached);
+            if (Date.now() - time < CACHE_TIME) {
+                starCountElem.innerText = stars;
+                return;
+            }
+        } catch {
+            localStorage.removeItem(CACHE_KEY);
         }
     }
     
@@ -373,13 +379,15 @@ function checkNetworkStatus() {
             const jitter = Math.floor(Math.random() * 5); 
             const latency = Math.round(end - start) + jitter;
 
-            textElem.innerText = `${latency}ms`;
+            textElem.innerText = `~${latency}ms`;
+            textElem.title = 'Estimated latency';
             const color = renderStatusDots(latency, dotsElem);
             textElem.className = `net-latency text-${color}`;
 
         } catch (error) {
             textElem.innerText = 'OFF';
             textElem.className = 'net-latency text-red';
+            textElem.title = 'Connectivity unavailable';
             renderStatusDots(-1, dotsElem);
         }
     };

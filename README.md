@@ -32,7 +32,7 @@
 * **💻 战术面板 (Tactical Dashboard)**
     * **GitHub Activity**：集成 `ghchart` 渲染提交热力图
     * **GitHub Star**：右上角实时显示项目 Star 数量
-    * **Smart Search**：集成 Google, Baidu, Bing, DuckDuckGo，支持点击切换引擎与 Tab/Enter 快捷键
+    * **Smart Search**：集成 Google, Baidu, Bing, DuckDuckGo，支持点击切换引擎与 Enter/方向键快捷键
     * **Keyboard Friendly**：搜索引擎选择器支持键盘操作（Enter/Space/ESC），更易用
     * **Time-based Greeting**：根据当前系统时间自动切换问候语
     * **Quick Links**：快捷导航卡片（博客、影院、图床、热点）
