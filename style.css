@@ -65,7 +65,7 @@ body {
     background-size: cover;
     background-position: center;
     z-index: -2;
-    filter: brightness(0.6) blur(2px) contrast(1.1); 
+    filter: brightness(0.42) blur(2px) contrast(1.15) saturate(0.95); 
     transition: background-image 0.5s ease-in-out;
 }
 
@@ -76,10 +76,12 @@ body {
     width: 100%;
     height: 100%;
     z-index: -1;
-    background-image: 
+    background-image:
+        radial-gradient(circle at center, rgba(15, 23, 42, 0.08) 0%, rgba(2, 6, 23, 0.45) 58%, rgba(0, 0, 0, 0.78) 100%),
+        linear-gradient(135deg, rgba(6, 182, 212, 0.12), rgba(15, 23, 42, 0.55) 45%, rgba(244, 114, 182, 0.1)),
         linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-    background-size: 30px 30px;
+    background-size: 100% 100%, 100% 100%, 30px 30px, 30px 30px;
     pointer-events: none;
 }
 
@@ -183,7 +185,7 @@ h1 {
 .option:hover { background: rgba(6, 182, 212, 0.2); color: var(--accent-cyan); }
 .search-box input {
     height: 50px; padding: 0 20px; border-radius: 0; border: 1px solid var(--glass-border);
-    border-left: none; border-right: none; outline: none; width: 55%; background: rgba(30, 41, 59, 0.9);
+    border-left: none; border-right: none; outline: none; flex: 1; min-width: 0; background: rgba(30, 41, 59, 0.9);
     font-size: 1rem; color: #fff; font-family: 'JetBrains Mono', monospace; transition: box-shadow 0.3s;
 }
 .search-box input:focus { box-shadow: inset 0 0 10px rgba(6, 182, 212, 0.2); }
@@ -220,11 +222,13 @@ h1 {
     overflow: hidden; 
     text-decoration: none; 
     color: #e2e8f0;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    border: 1px solid rgba(6, 182, 212, 0.14);
 }
 
-.card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(6, 182, 212, 0.15); }
+.card:hover,
+.card:focus-visible { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(6, 182, 212, 0.18); border-color: rgba(6, 182, 212, 0.35); }
 
 .card::before {
     content: '';
@@ -234,8 +238,14 @@ h1 {
     background-image: linear-gradient(180deg, var(--accent-cyan), var(--accent-pink));
     top: 50%;
     left: 50%;
+    opacity: 0;
     animation: rotBGimg 3s linear infinite;
+    animation-play-state: paused;
+    transition: opacity 0.25s ease;
 }
+
+.card:hover::before,
+.card:focus-visible::before { opacity: 1; animation-play-state: running; }
 
 @keyframes rotBGimg {
     from { transform: translate(-50%, -50%) rotate(0deg); }
@@ -260,7 +270,8 @@ h1 {
 }
 .card h3 { font-size: 1em; font-weight: 700; margin-bottom: 2px; color: #fff; letter-spacing: 1px; }
 .card p { font-size: 0.65em; font-family: 'JetBrains Mono', monospace; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
-.card:hover .icon { color: var(--accent-pink); }
+.card:hover .icon,
+.card:focus-visible .icon { color: var(--accent-pink); }
 
 /* =================================================================
    GitHub 概览
@@ -355,7 +366,7 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
     align-items: center;
     justify-content: center;
     gap: 8px;
-    background-color: #000;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.78), rgba(8, 47, 73, 0.6));
     color: #fff;
     font-size: 0.8rem;
     font-weight: 500;
@@ -366,13 +377,17 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
     position: relative;
     overflow: hidden;
     transition: all 0.3s ease-out;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    border: 1px solid rgba(6, 182, 212, 0.34);
+    box-shadow: 0 10px 26px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.08);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     max-width: 200px;
 }
 
 .github-star-btn:hover {
-    background-color: rgba(0, 0, 0, 0.9);
-    box-shadow: 0 0 0 2px #000, 0 0 0 4px rgba(0, 0, 0, 0.2);
+    border-color: rgba(6, 182, 212, 0.72);
+    box-shadow: 0 0 0 1px rgba(6, 182, 212, 0.22), 0 0 24px rgba(6, 182, 212, 0.28), inset 0 1px 0 rgba(255,255,255,0.12);
+    transform: translateY(-1px);
 }
 
 .btn-left { display: flex; align-items: center; }
@@ -389,7 +404,7 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
     height: 128px;
     width: 32px;
     background-color: #fff;
-    opacity: 0.1;
+    opacity: 0.08;
     transform: translateX(48px) rotate(12deg);
     transition: all 1s ease-out;
     pointer-events: none;
@@ -398,24 +413,23 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
 .github-star-btn:hover .shine-effect { transform: translateX(-500px) rotate(12deg); }
 
 /* =================================================================
-   右下角固定图标 (严格引用 Uiverse 原始样式)
+   右下角固定图标
    ================================================================= */
 .fixed-links {
     position: fixed;
-    bottom: 20px;
+    bottom: 22px;
     right: 25px;
     display: flex;
     gap: 15px; 
     z-index: 1000;
 }
 
-/* 按钮基础颜色，确保图标可见 */
 .Btn i {
-    color: #fff;
+    color: #e2e8f0;
     font-size: 1.2rem;
+    transition: color 0.25s ease, filter 0.25s ease;
 }
 
-/* From Uiverse.io by vinodjangid07 */ 
 .Btn {
   width: 45px;
   height: 45px;
@@ -423,13 +437,20 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
   align-items: center;
   justify-content: center;
   border: none;
-  background-color: transparent;
+  background: rgba(15, 23, 42, 0.42);
   position: relative;
-  /* overflow: hidden; */
-  border-radius: 7px;
+  overflow: hidden;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all .3s;
+  border: 1px solid rgba(6, 182, 212, 0.22);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease, background .25s ease;
 }
+
+.Btn:hover { transform: translateY(-3px); border-color: rgba(6, 182, 212, 0.62); background: rgba(8, 47, 73, 0.54); box-shadow: 0 0 22px rgba(6, 182, 212, 0.22), 0 12px 30px rgba(0,0,0,0.36); }
+.Btn:hover i { color: var(--accent-cyan); filter: drop-shadow(0 0 6px rgba(6, 182, 212, 0.75)); }
 
 .svgContainer {
   width: 100%;
@@ -438,11 +459,12 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
   align-items: center;
   justify-content: center;
   background-color: transparent;
-  backdrop-filter: blur(4px);
+  position: relative;
+  z-index: 1;
   letter-spacing: 0.8px;
-  border-radius: 10px;
+  border-radius: 12px;
   transition: all .3s;
-  border: 1px solid rgba(156, 156, 156, 0.466);
+  border: none;
 }
 
 .BG {
@@ -450,25 +472,15 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
   content: "";
   width: 100%;
   height: 100%;
-  background: #f09433;
-  background: -moz-linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-  background: -webkit-linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
-  background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f09433', endColorstr='#bc1888',GradientType=1 );
-  z-index: -1;
-  border-radius: 9px;
+  background: radial-gradient(circle at 50% 120%, rgba(244, 114, 182, 0.2), transparent 52%), linear-gradient(135deg, rgba(6, 182, 212, 0.16), transparent 58%);
+  z-index: 0;
+  border-radius: 12px;
   pointer-events: none;
-  transition: all .3s;
+  opacity: 0;
+  transition: opacity .3s;
 }
 
-.Btn:hover .BG {
-  transform: rotate(35deg);
-  transform-origin: bottom;
-}
-
-.Btn:hover .svgContainer {
-  background-color: rgba(156, 156, 156, 0.466);
-}
+.Btn:hover .BG { opacity: 1; }
 
 /* =================================================================
    Network Monitor (新功能区域)
@@ -483,10 +495,36 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
     margin: 0 auto 30px auto;
 }
 
+.network-title { position: relative; justify-content: center; }
+.network-title span { display: flex; align-items: center; gap: 8px; }
+.network-toggle {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 1px solid rgba(6, 182, 212, 0.32);
+    background: rgba(15, 23, 42, 0.58);
+    color: var(--accent-cyan);
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    cursor: pointer;
+}
+.network-summary {
+    margin-bottom: 12px;
+    color: #64748b;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 1px;
+    text-align: left;
+}
+
 /* Connectivity Grid */
 .connectivity-grid {
     display: grid;
-    /* 强制一行4个 */
     grid-template-columns: repeat(4, 1fr);
     gap: 12px;
 }
@@ -546,14 +584,23 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px; fon
    移动端适配
    ================================================================= */
 @media (max-width: 600px) {
-    .container { width: 95%; padding: 30px 20px; padding-top: 20px; }
+    .container { width: 95%; padding: 30px 18px; padding-top: 20px; }
     .cards-grid { grid-template-columns: repeat(2, 1fr); }
-    .search-box input { width: 40%; }
+    .search-box { max-width: 100%; }
+    .search-engine-selector { flex: 0 0 auto; }
+    .search-box input { flex: 1 1 auto; width: auto; padding: 0 14px; font-size: 0.9rem; }
+    .search-box button { width: 56px; flex: 0 0 56px; }
     .star-btn-container { position: static; margin-bottom: 20px; width: 100%; }
     .github-star-btn { width: auto; margin: 0 auto; }
-    
-    /* 移动端强制变成2列，防止挤压 */
+    .network-toggle { display: inline-flex; align-items: center; }
+    .network-section.is-collapsed .connectivity-grid { display: none; }
     .connectivity-grid { grid-template-columns: repeat(2, 1fr); }
+    .fixed-links { right: 16px; bottom: 76px; gap: 10px; }
+    .Btn { width: 40px; height: 40px; }
+}
+
+@media (min-width: 601px) and (max-width: 980px) {
+    .connectivity-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
 /* =================================================================

@@ -58,6 +58,13 @@ const searchEngines = {
     duckduckgo: { url: "https://duckduckgo.com/?q=", icon: "fas fa-shield-alt", placeholder: "Privacy Search..." }
 };
 
+const commandRoutes = {
+    '/blog': 'https://monki.de5.net',
+    '/video': 'https://video.885123.xyz',
+    '/pic': 'https://pic.soomin.de5.net',
+    '/news': 'https://news.885123.xyz'
+};
+
 // 定义引擎顺序，用于 Tab 切换
 const engineKeys = Object.keys(searchEngines);
 let currentEngineIndex = 2; // 默认 Bing (索引2)
@@ -69,6 +76,12 @@ const selectedEngineButton = document.getElementById('selected-engine');
 const searchInput = document.getElementById('search-input');
 const searchButton = document.getElementById('search-btn');
 const engineOptionButtons = engineOptions ? Array.from(engineOptions.querySelectorAll('.option')) : [];
+
+function isEditableTarget(target) {
+    if (!target) return false;
+    const tagName = target.tagName ? target.tagName.toLowerCase() : '';
+    return tagName === 'input' || tagName === 'textarea' || target.isContentEditable;
+}
 
 function fetchWithTimeout(url, options = {}, timeout = 5000) {
     const controller = new AbortController();
@@ -144,6 +157,11 @@ function doSearch() {
     if (!searchInput) return;
     const query = searchInput.value.trim();
     if (query) {
+        const route = commandRoutes[query.toLowerCase()];
+        if (route) {
+            window.open(route, '_blank');
+            return;
+        }
         window.open(searchEngines[currentEngine].url + encodeURIComponent(query), '_blank');
     } else {
         searchInput.focus();
@@ -158,6 +176,12 @@ document.addEventListener('click', function(e) {
 
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') closeEngineMenu();
+
+    if (e.key === '/' && !isEditableTarget(e.target) && searchInput) {
+        e.preventDefault();
+        searchInput.focus();
+        searchInput.select();
+    }
 });
 
 // 键盘事件监听 (Enter 搜索, Tab 切换)
@@ -225,7 +249,7 @@ function updateClock() {
 function fetchHitokoto() {
     fetchJsonWithRetry('https://v1.hitokoto.cn/?c=a&c=b', {}, { timeout: 3500, retries: 1, retryDelay: 250 })
         .then(data => { document.getElementById('hitokoto_text').innerText = `${data.hitokoto} —— ${data.from}`; })
-        .catch(() => { document.getElementById('hitokoto_text').innerText = "System connected. Ready for input."; });
+        .catch(() => { document.getElementById('hitokoto_text').innerText = "QUOTE: ONLINE / READY"; });
 }
 
 
@@ -290,7 +314,7 @@ function fetchWeather() {
 
                 weather.getLive(targetAdcode, (err, data) => {
                     if (!err && data.info === 'OK') {
-                        finalizeWeather(`${data.city}: ${data.weather} ${data.temperature}℃`);
+                        finalizeWeather(`WEATHER: ${data.city} / ${data.weather} / ${data.temperature}℃`);
                     } else {
                         trySeniverse();
                     }
@@ -307,12 +331,12 @@ function fetchWeather() {
             .then(data => {
                 if (data.results && data.results[0]) {
                     const res = data.results[0];
-                    finalizeWeather(`${res.location.name}: ${res.now.text} ${res.now.temperature}℃`);
+                    finalizeWeather(`WEATHER: ${res.location.name} / ${res.now.text} / ${res.now.temperature}℃`);
                 } else {
-                    finalizeWeather("Weather Offline");
+                    finalizeWeather("WEATHER: OFFLINE");
                 }
             })
-            .catch(() => { finalizeWeather("Weather Offline"); });
+            .catch(() => { finalizeWeather("WEATHER: OFFLINE"); });
     }
 
     startWeatherSystem();
@@ -323,6 +347,7 @@ function fetchWeather() {
 function fetchGithubStars() {
     const starCountElem = document.getElementById('github-star-count');
     if (!starCountElem) return;
+    starCountElem.innerText = 'SYNC';
     const CACHE_KEY = 'gh_stars_cache';
     const CACHE_TIME = 3600000; // 1小时
     
@@ -361,12 +386,12 @@ function fetchGithubStars() {
                 // 缓存结果
                 localStorage.setItem(CACHE_KEY, JSON.stringify({ stars, time: Date.now() }));
             } else {
-                starCountElem.innerText = "-";
+                starCountElem.innerText = "OFF";
             }
         })
         .catch(err => {
             console.warn("GitHub Star fetch failed:", err.message);
-            starCountElem.innerText = "N/A";
+            starCountElem.innerText = "OFF";
 
             if (err.name === 'AbortError') {
                 starCountElem.title = "GitHub API Timeout";
@@ -383,6 +408,9 @@ function fetchGithubStars() {
 // 7. 网络状态监控 (Refined: 动态生成 + 实时心跳 + 呼吸感监测)
 function checkNetworkStatus() {
     const grid = document.getElementById('network-grid');
+    const networkSection = document.getElementById('network-section');
+    const networkToggle = document.getElementById('network-toggle');
+    const networkSummary = document.getElementById('network-summary');
     
     // 配置列表
     const targets = [
@@ -405,7 +433,7 @@ function checkNetworkStatus() {
                     <span class="net-badge badge-${t.type}">${t.type === 'cn' ? '国内' : '国际'}</span>
                 </div>
                 <div class="net-body">
-                    <span class="net-latency" id="ping-${t.id}">WAIT</span>
+                    <span class="net-latency" id="ping-${t.id}">PING</span>
                     <div class="status-dots" id="status-${t.id}">
                         <div class="dot"></div><div class="dot"></div><div class="dot"></div>
                         <div class="dot"></div><div class="dot"></div><div class="dot"></div>
@@ -413,6 +441,23 @@ function checkNetworkStatus() {
                 </div>
             </div>
         `).join('');
+    }
+
+    if (networkSummary) networkSummary.innerText = `NETWORK: ${targets.length} NODES STANDBY`;
+
+    function setNetworkCollapsed(isCollapsed) {
+        if (!networkSection || !networkToggle) return;
+        networkSection.classList.toggle('is-collapsed', isCollapsed);
+        networkToggle.setAttribute('aria-expanded', String(!isCollapsed));
+        networkToggle.innerText = isCollapsed ? 'DETAILS' : 'HIDE';
+    }
+
+    if (networkToggle && networkSection) {
+        const shouldCollapse = window.matchMedia('(max-width: 600px)').matches;
+        setNetworkCollapsed(shouldCollapse);
+        networkToggle.addEventListener('click', function() {
+            setNetworkCollapsed(!networkSection.classList.contains('is-collapsed'));
+        });
     }
 
     // 2. 渲染信号灯 (Helper)
@@ -482,6 +527,7 @@ function checkNetworkStatus() {
             textElem.title = 'Estimated latency';
             const color = renderStatusDots(latency, dotsElem);
             textElem.className = `net-latency text-${color}`;
+            if (networkSummary) networkSummary.innerText = `NETWORK: ${targets.length} NODES MONITORING`;
         } catch {
             textElem.innerText = 'OFF';
             textElem.className = 'net-latency text-red';
@@ -495,8 +541,8 @@ function checkNetworkStatus() {
         const loop = async () => {
             await pingTarget(target);
             
-            // 随机间隔 1.5s 到 3.5s，让由于网络波动造成的数值跳动看起来“此起彼伏”
-            const nextDelay = Math.floor(Math.random() * 2000) + 1500; 
+            // 放慢刷新节奏，减少延迟数字频繁跳动造成的视觉噪音
+            const nextDelay = Math.floor(Math.random() * 7000) + 8000; 
             setTimeout(loop, nextDelay);
         };
         

@@ -54,7 +54,7 @@
             background-size: cover;
             background-position: center;
             z-index: -2;
-            filter: brightness(0.6) blur(2px) contrast(1.1); 
+            filter: brightness(0.42) blur(2px) contrast(1.15) saturate(0.95); 
         }
         .grid-overlay {
             position: fixed;
@@ -63,10 +63,12 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            background-image: 
+            background-image:
+                radial-gradient(circle at center, rgba(15, 23, 42, 0.08) 0%, rgba(2, 6, 23, 0.45) 58%, rgba(0, 0, 0, 0.78) 100%),
+                linear-gradient(135deg, rgba(6, 182, 212, 0.12), rgba(15, 23, 42, 0.55) 45%, rgba(244, 114, 182, 0.1)),
                 linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 30px 30px;
+            background-size: 100% 100%, 100% 100%, 30px 30px, 30px 30px;
             pointer-events: none;
         }
         #preloader {
@@ -115,7 +117,7 @@
                     <svg class="icon-star-mini" viewBox="0 0 24 24" fill="currentColor">
                         <path clip-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" fill-rule="evenodd"></path>
                     </svg>
-                    <span id="github-star-count" class="star-count">...</span>
+                    <span id="github-star-count" class="star-count">SYNC</span>
                 </div>
             </a>
         </div>
@@ -125,8 +127,8 @@
                 <img src="./avatar.jpg" alt="Loong Avatar">
             </div>
             <h1 id="greeting">你好</h1>
-            <p class="hitokoto" id="hitokoto_text" aria-live="polite">正在建立神经连接...</p>
-            <div id="weather-status" class="status-line" aria-live="polite">LOCATING...</div>
+            <p class="hitokoto" id="hitokoto_text" aria-live="polite">QUOTE: SYNCING...</p>
+            <div id="weather-status" class="status-line" aria-live="polite">WEATHER: LOCATING...</div>
         </header>
 
         <div class="search-box">
@@ -171,11 +173,14 @@
             </div>
         </div>
 
-        <div class="network-section">
-            <div class="section-title"><i class="fas fa-network-wired"></i> NETWORK STATUS</div>
-            
+        <div class="network-section" id="network-section">
+            <div class="section-title network-title">
+                <span><i class="fas fa-network-wired"></i> NETWORK STATUS</span>
+                <button id="network-toggle" class="network-toggle" type="button" aria-expanded="true" aria-controls="network-grid">HIDE</button>
+            </div>
+            <div id="network-summary" class="network-summary" aria-live="polite">NETWORK: 8 NODES STANDBY</div>
             <div class="connectivity-grid" id="network-grid">
-                </div>
+            </div>
         </div>
 
         <footer>
