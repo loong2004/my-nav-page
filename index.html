@@ -3,209 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Loong's Personal Portal - A Cyberpunk Dashboard">
-    <meta name="theme-color" content="#0f172a">
+    <meta name="description" content="Loong 的个人工作台：搜索、导航与网络状态一站直达。">
+    <meta name="theme-color" content="#151512">
     <meta name="color-scheme" content="dark">
-    
+
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://nav.885123.xyz/">
-    <meta property="og:title" content="Loong's Terminal | 个人赛博指挥中心">
-    <meta property="og:description" content="System Online. Waiting for command...">
+    <meta property="og:title" content="Loong's Desk | 个人工作台">
+    <meta property="og:description" content="Search less. Go further.">
     <meta property="og:image" content="./avatar.jpg">
 
-    <title>Loong's Terminal | 个人控制台</title>
-    
+    <title>Loong's Desk | 个人工作台</title>
+
     <link rel="preconnect" href="https://api.paugram.com">
     <link rel="preconnect" href="https://npm.elemecdn.com">
     <link rel="preconnect" href="https://cdn.bootcdn.net">
     <link rel="preconnect" href="https://ghchart.rshah.org">
     <link rel="preconnect" href="https://images.unsplash.com">
 
-    <!-- 优雅中文字体：使用 LXGW WenKai Lite 轻量版 -->
     <link rel="stylesheet" href="https://npm.elemecdn.com/lxgw-wenkai-lite-webfont@1.1.0/style.css">
     <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <link rel="stylesheet" href="https://npm.elemecdn.com/aplayer/dist/APlayer.min.css">
-
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="./avatar.jpg">
-    
+
     <style>
-        /* 关键首屏样式内联，提升 FCP 性能 */
         body {
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            color: #e2e8f0;
-            background-color: #0f172a;
             margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: #f2f0e9;
+            background: #151512;
         }
-        .background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-size: cover;
-            background-position: center;
-            z-index: -2;
-            filter: brightness(0.42) blur(2px) contrast(1.15) saturate(0.95); 
-        }
+
+        .background,
         .grid-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background-image:
-                radial-gradient(circle at center, rgba(15, 23, 42, 0.08) 0%, rgba(2, 6, 23, 0.45) 58%, rgba(0, 0, 0, 0.78) 100%),
-                linear-gradient(135deg, rgba(6, 182, 212, 0.12), rgba(15, 23, 42, 0.55) 45%, rgba(244, 114, 182, 0.1)),
-                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 100% 100%, 100% 100%, 30px 30px, 30px 30px;
+            inset: 0;
             pointer-events: none;
         }
+
+        .background {
+            z-index: -2;
+            background-position: center;
+            background-size: cover;
+            opacity: 0;
+        }
+
+        .grid-overlay {
+            z-index: -1;
+            background: rgba(16, 16, 13, 0.91);
+        }
+
         #preloader {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #0f172a; 
-            z-index: 9999; 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 1;
-            visibility: visible;
-            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+            inset: 0;
+            z-index: 9999;
+            display: grid;
+            place-items: center;
+            background: #151512;
+            transition: opacity 0.35s ease, visibility 0.35s ease;
         }
+
         #preloader.hidden {
-            opacity: 0;
             visibility: hidden;
+            opacity: 0;
             pointer-events: none;
         }
     </style>
 </head>
 <body>
-    <div id="preloader">
+    <div id="preloader" aria-hidden="true">
         <div class="loader">
-            <span class="loader-text">loading</span>
+            <span class="loader-mark">L</span>
             <span class="load"></span>
         </div>
     </div>
+
     <div class="background"></div>
     <div class="grid-overlay"></div>
 
-    <div class="container">
-        <div class="star-btn-container">
-            <a href="https://github.com/loong2004/my-nav-page" target="_blank" rel="noopener noreferrer" class="github-star-btn">
-                <span class="shine-effect"></span>
-                <div class="btn-left">
-                    <svg class="icon-github-logo" viewBox="0 0 438.549 438.549">
-                        <path d="M409.132 114.573c-19.608-33.596-46.205-60.194-79.798-79.8-33.598-19.607-70.277-29.408-110.063-29.408-39.781 0-76.472 9.804-110.063 29.408-33.596 19.605-60.192 46.204-79.8 79.8C9.803 148.168 0 184.854 0 224.63c0 47.78 13.94 90.745 41.827 128.906 27.884 38.164 63.906 64.572 108.063 79.227 5.14.954 8.945.283 11.419-1.996 2.475-2.282 3.711-5.14 3.711-8.562 0-.571-.049-5.708-.144-15.417a2549.81 2549.81 0 01-.144-25.406l-6.567 1.136c-4.187.767-9.469 1.092-15.846 1-6.374-.089-12.991-.757-19.842-1.999-6.854-1.231-13.229-4.086-19.13-8.559-5.898-4.473-10.085-10.328-12.56-17.556l-2.855-6.57c-1.903-4.374-4.899-9.233-8.992-14.559-4.093-5.331-8.232-8.945-12.419-10.848l-1.999-1.431c-1.332-.951-2.568-2.098-3.711-3.429-1.142-1.331-1.997-2.663-2.568-3.997-.572-1.335-.098-2.43 1.427-3.289 1.525-.859 4.281-1.276 8.28-1.276l5.708.853c3.807.763 8.516 3.042 14.133 6.851 5.614 3.806 10.229 8.754 13.846 14.842 4.38 7.806 9.657 13.754 15.846 17.847 6.184 4.093 12.419 6.136 18.699 6.136 6.28 0 11.704-.476 16.274-1.423 4.565-.952 8.848-2.383 12.847-4.285 1.713-12.758 6.377-22.559 13.988-29.41-10.848-1.14-20.601-2.857-29.264-5.14-8.658-2.286-17.605-5.996-26.835-11.14-9.235-5.137-16.896-11.516-22.985-19.126-6.09-7.614-11.088-17.61-14.987-29.979-3.901-12.374-5.852-26.648-5.852-42.826 0-23.035 7.52-42.637 22.557-58.817-7.044-17.318-6.379-36.732 1.997-58.24 5.52-1.715 13.706-.428 24.554 3.853 10.85 4.283 18.794 7.952 23.84 10.994 5.046 3.041 9.089 5.618 12.135 7.708 17.705-4.947 35.976-7.421 54.818-7.421s37.117 2.474 54.823 7.421l10.849-6.849c7.419-4.57 16.18-8.758 26.262-12.565 10.088-3.805 17.802-4.853 23.134-3.138 8.562 21.509 9.325 40.922 2.279 58.24 15.036 16.18 22.559 35.787 22.559 58.817 0 16.178-1.958 30.497-5.853 42.966-3.9 12.471-8.941 22.457-15.125 29.979-6.191 7.521-13.901 13.85-23.131 18.986-9.232 5.14-18.182 8.85-26.84 11.136-8.662 2.286-18.415 4.004-29.263 5.146 9.894 8.562 14.842 22.077 14.842 40.539v60.237c0 3.422 1.19 6.279 3.572 8.562 2.379 2.279 6.136 2.95 11.276 1.995 44.163-14.653 80.185-41.062 108.068-79.226 27.88-38.161 41.825-81.126 41.825-128.906-.01-39.771-9.818-76.454-29.414-110.049z"></path>
-                    </svg>
-                    <span>Star on GitHub</span>
-                </div>
-                <div class="btn-right">
-                    <svg class="icon-star-mini" viewBox="0 0 24 24" fill="currentColor">
-                        <path clip-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" fill-rule="evenodd"></path>
-                    </svg>
+    <main class="container">
+        <nav class="topbar" aria-label="主导航">
+            <a class="wordmark" href="#top" aria-label="返回顶部">
+                <span class="wordmark-mark">L</span>
+                <span class="wordmark-copy">
+                    <strong>LOONG'S DESK</strong>
+                    <small>PERSONAL WORKSPACE</small>
+                </span>
+            </a>
+
+            <div class="top-actions">
+                <a href="mailto:monki@monki.de5.net" class="icon-link" aria-label="发送邮件" title="Email">
+                    <i class="fa-regular fa-envelope"></i>
+                </a>
+                <a href="https://github.com/loong2004/my-nav-page" target="_blank" rel="noopener noreferrer" class="github-star-btn">
+                    <i class="fab fa-github" aria-hidden="true"></i>
+                    <span>GitHub</span>
+                    <span class="star-divider" aria-hidden="true"></span>
+                    <i class="fa-solid fa-star star-icon" aria-hidden="true"></i>
                     <span id="github-star-count" class="star-count">SYNC</span>
-                </div>
-            </a>
-        </div>
-
-        <header>
-            <div class="avatar">
-                <img src="./avatar.jpg" alt="Loong Avatar">
+                </a>
             </div>
-            <h1 id="greeting">你好</h1>
-            <p class="hitokoto" id="hitokoto_text" aria-live="polite">QUOTE: SYNCING...</p>
-            <div id="weather-status" class="status-line" aria-live="polite">WEATHER: LOCATING...</div>
-        </header>
+        </nav>
 
-        <div class="search-box">
-            <div class="search-engine-selector" id="engine-selector">
-                <div class="selected-engine" id="selected-engine" role="button" tabindex="0" aria-label="选择搜索引擎" aria-expanded="false" aria-controls="engine-options">
-                    <i class="fab fa-microsoft" id="current-engine-icon"></i>
+        <section class="hero" id="top" aria-labelledby="hero-title">
+            <figure class="profile-visual">
+                <img src="./avatar.jpg" alt="Loong 的头像">
+                <figcaption>
+                    <span class="live-dot" aria-hidden="true"></span>
+                    <span>ONLINE &amp; CREATING</span>
+                </figcaption>
+            </figure>
+
+            <div class="hero-copy">
+                <div class="hero-utility">
+                    <span>WELCOME TO MY SPACE</span>
+                    <time id="clock">00:00:00</time>
                 </div>
-                <div class="engine-options" id="engine-options" role="menu" aria-hidden="true">
-                    <div class="option" role="menuitem" tabindex="0" data-engine="google"><i class="fab fa-google"></i> <span>Google</span></div>
-                    <div class="option" role="menuitem" tabindex="0" data-engine="baidu"><i class="fas fa-paw"></i> <span>Baidu</span></div>
-                    <div class="option" role="menuitem" tabindex="0" data-engine="bing"><i class="fab fa-microsoft"></i> <span>Bing</span></div>
-                    <div class="option" role="menuitem" tabindex="0" data-engine="duckduckgo"><i class="fas fa-shield-alt"></i> <span>DuckDuckGo</span></div>
+
+                <h1 id="hero-title">
+                    <span class="brand-name">LOONG.</span>
+                    <span id="greeting">你好</span>
+                </h1>
+
+                <p class="hitokoto" id="hitokoto_text" aria-live="polite">正在为你取一句话...</p>
+
+                <div class="search-box" role="search">
+                    <div class="search-engine-selector" id="engine-selector">
+                        <div class="selected-engine" id="selected-engine" role="button" tabindex="0" aria-label="选择搜索引擎" aria-expanded="false" aria-controls="engine-options">
+                            <i class="fab fa-microsoft" id="current-engine-icon" aria-hidden="true"></i>
+                            <i class="fa-solid fa-chevron-down engine-chevron" aria-hidden="true"></i>
+                        </div>
+                        <div class="engine-options" id="engine-options" role="menu" aria-hidden="true">
+                            <div class="option" role="menuitem" tabindex="0" data-engine="google"><i class="fab fa-google"></i><span>Google</span></div>
+                            <div class="option" role="menuitem" tabindex="0" data-engine="baidu"><i class="fas fa-paw"></i><span>Baidu</span></div>
+                            <div class="option" role="menuitem" tabindex="0" data-engine="bing"><i class="fab fa-microsoft"></i><span>Bing</span></div>
+                            <div class="option" role="menuitem" tabindex="0" data-engine="duckduckgo"><i class="fas fa-shield-alt"></i><span>DuckDuckGo</span></div>
+                        </div>
+                    </div>
+                    <span class="search-prompt" aria-hidden="true">&gt;</span>
+                    <input type="search" id="search-input" placeholder="搜索网络..." autofocus autocomplete="off" spellcheck="false" aria-label="搜索关键词">
+                    <button id="search-btn" type="button" aria-label="搜索">
+                        <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                    </button>
+                </div>
+
+                <div id="weather-status" class="status-line" aria-live="polite">
+                    <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+                    <span>正在获取天气...</span>
                 </div>
             </div>
-            <input type="text" id="search-input" placeholder="Enter Command..." autofocus autocomplete="off" spellcheck="false" aria-label="搜索关键词">
-            <button id="search-btn" type="button" aria-label="搜索"><i class="fas fa-search"></i></button>
-        </div>
+        </section>
 
-        <div class="cards-grid">
-            <a href="https://monki.de5.net" target="_blank" rel="noopener noreferrer" class="card">
-                <div class="icon"><i class="fas fa-rss"></i></div>
-                <div class="info"><h3>个人博客</h3><p>BLOG LINK</p></div>
-            </a>
-            <a href="https://video.885123.xyz" target="_blank" rel="noopener noreferrer" class="card">
-                <div class="icon"><i class="fas fa-play-circle"></i></div>
-                <div class="info"><h3>私人影院</h3><p>VIDEO HUB</p></div>
-            </a>
-            <a href="https://pic.soomin.de5.net" target="_blank" rel="noopener noreferrer" class="card">
-                <div class="icon"><i class="fas fa-image"></i></div>
-                <div class="info"><h3>个人图床</h3><p>IMG STORAGE</p></div>
-            </a>
-            <a href="https://news.885123.xyz" target="_blank" rel="noopener noreferrer" class="card">
-                <div class="icon"><i class="fas fa-server"></i></div>
-                <div class="info"><h3>每日热点</h3><p>NEWS CENTER</p></div>
-            </a>
-        </div>
+        <section class="destinations" aria-labelledby="destinations-title">
+            <div class="section-heading">
+                <div>
+                    <span class="section-kicker">QUICK ACCESS</span>
+                    <h2 id="destinations-title">我的空间</h2>
+                </div>
+                <span class="section-count">04 DESTINATIONS</span>
+            </div>
 
-        <div class="github-section">
-            <div class="section-title"><i class="fab fa-github-alt"></i> COMMIT ACTIVITY</div>
+            <div class="cards-grid">
+                <a href="https://monki.de5.net" target="_blank" rel="noopener noreferrer" class="card card-blog">
+                    <span class="card-icon"><i class="fas fa-rss" aria-hidden="true"></i></span>
+                    <span class="card-copy"><strong>个人博客</strong><small>想法与技术记录</small></span>
+                    <i class="fas fa-arrow-up-right-from-square card-arrow" aria-hidden="true"></i>
+                </a>
+                <a href="https://video.885123.xyz" target="_blank" rel="noopener noreferrer" class="card card-video">
+                    <span class="card-icon"><i class="fas fa-play" aria-hidden="true"></i></span>
+                    <span class="card-copy"><strong>私人影院</strong><small>收藏与观看清单</small></span>
+                    <i class="fas fa-arrow-up-right-from-square card-arrow" aria-hidden="true"></i>
+                </a>
+                <a href="https://pic.soomin.de5.net" target="_blank" rel="noopener noreferrer" class="card card-image">
+                    <span class="card-icon"><i class="far fa-image" aria-hidden="true"></i></span>
+                    <span class="card-copy"><strong>个人图床</strong><small>图像与素材仓库</small></span>
+                    <i class="fas fa-arrow-up-right-from-square card-arrow" aria-hidden="true"></i>
+                </a>
+                <a href="https://news.885123.xyz" target="_blank" rel="noopener noreferrer" class="card card-news">
+                    <span class="card-icon"><i class="far fa-newspaper" aria-hidden="true"></i></span>
+                    <span class="card-copy"><strong>每日热点</strong><small>今天值得关注的事</small></span>
+                    <i class="fas fa-arrow-up-right-from-square card-arrow" aria-hidden="true"></i>
+                </a>
+            </div>
+        </section>
+
+        <section class="github-section" aria-labelledby="github-title">
+            <div class="section-heading compact-heading">
+                <div>
+                    <span class="section-kicker">BUILD IN PUBLIC</span>
+                    <h2 id="github-title">代码足迹</h2>
+                </div>
+                <a href="https://github.com/loong2004" target="_blank" rel="noopener noreferrer" class="text-link">
+                    @loong2004 <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                </a>
+            </div>
             <div class="github-graph-container">
-                <img src="https://ghchart.rshah.org/06b6d4/loong2004" alt="GitHub Contributions" class="gh-chart" loading="lazy" decoding="async">
+                <img src="https://ghchart.rshah.org/ff6b3d/loong2004" alt="Loong 的 GitHub 贡献图" class="gh-chart" loading="lazy" decoding="async">
             </div>
-        </div>
+        </section>
 
-        <div class="network-section" id="network-section">
-            <div class="section-title network-title">
-                <span><i class="fas fa-network-wired"></i> NETWORK STATUS</span>
-                <button id="network-toggle" class="network-toggle" type="button" aria-expanded="true" aria-controls="network-grid">HIDE</button>
+        <section class="network-section" id="network-section" aria-labelledby="network-title-text">
+            <div class="section-heading compact-heading network-title">
+                <div>
+                    <span class="section-kicker">LIVE CONNECTIONS</span>
+                    <h2 id="network-title-text">网络状态</h2>
+                </div>
+                <button id="network-toggle" class="network-toggle" type="button" aria-expanded="true" aria-controls="network-grid">
+                    <span>收起</span>
+                    <i class="fas fa-chevron-up" aria-hidden="true"></i>
+                </button>
             </div>
-            <div id="network-summary" class="network-summary" aria-live="polite">NETWORK: 8 NODES STANDBY</div>
-            <div class="connectivity-grid" id="network-grid">
-            </div>
-        </div>
+            <div id="network-summary" class="network-summary" aria-live="polite">8 个节点等待响应</div>
+            <div class="connectivity-grid" id="network-grid"></div>
+        </section>
 
         <footer>
-            <div id="clock">00:00:00</div>
-            <p>&copy; 2025 Loong's Terminal. System Normal.</p>
+            <p>&copy; 2026 Loong. Built for the open web.</p>
+            <div class="footer-links">
+                <a href="https://github.com/loong2004" target="_blank" rel="noopener noreferrer">GitHub</a>
+                <a href="mailto:monki@monki.de5.net">Email</a>
+            </div>
         </footer>
-        
-        <div style="height: 60px;"></div>
-    </div>
-
-    <div class="fixed-links">
-        <a href="https://github.com/loong2004" target="_blank" rel="noopener noreferrer" class="Btn" title="GitHub">
-            <span class="svgContainer">
-                <i class="fab fa-github"></i>
-            </span>
-            <span class="BG"></span>
-        </a>
-        
-        <a href="mailto:monki@monki.de5.net" class="Btn" title="Email Me">
-            <span class="svgContainer">
-                <i class="fas fa-envelope"></i>
-            </span>
-            <span class="BG"></span>
-        </a>
-    </div>
+    </main>
 
     <meting-js
         server="netease"
