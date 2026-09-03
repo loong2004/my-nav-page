@@ -16,9 +16,9 @@
     --status-green: #68d391;
     --status-yellow: #f3c75f;
     --status-red: #ff7066;
-    --display-font: "Arial Narrow", "Roboto Condensed", "Segoe UI", sans-serif;
-    --body-font: "LXGW WenKai Lite", "LXGW WenKai", "Microsoft YaHei", sans-serif;
-    --utility-font: ui-monospace, "SFMono-Regular", Consolas, monospace;
+    --display-font: "Manrope Variable", "Noto Sans SC Variable", sans-serif;
+    --body-font: "Noto Sans SC Variable", sans-serif;
+    --utility-font: "JetBrains Mono Variable", ui-monospace, monospace;
 }
 
 @font-face {
@@ -45,7 +45,10 @@ body {
     color: var(--text);
     background: var(--canvas);
     font-family: var(--body-font);
+    font-weight: 400;
     line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
 }
 
 a,
@@ -90,50 +93,11 @@ input:focus-visible,
     min-height: 84px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     gap: 24px;
     border-bottom: 1px solid var(--line);
 }
 
-.wordmark {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    min-width: 0;
-    text-decoration: none;
-}
-
-.wordmark-mark {
-    width: 36px;
-    height: 36px;
-    display: grid;
-    place-items: center;
-    flex: 0 0 36px;
-    border-radius: 4px;
-    color: var(--ink);
-    background: var(--accent);
-    font-family: var(--display-font);
-    font-size: 1.35rem;
-    font-weight: 900;
-}
-
-.wordmark-copy {
-    display: flex;
-    min-width: 0;
-    flex-direction: column;
-    line-height: 1.05;
-}
-
-.wordmark-copy strong {
-    overflow: hidden;
-    font-family: var(--display-font);
-    font-size: 0.95rem;
-    font-weight: 800;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.wordmark-copy small,
 .section-kicker,
 .section-count,
 .hero-utility,
@@ -143,11 +107,6 @@ input:focus-visible,
     font-size: 0.66rem;
     letter-spacing: 0;
     text-transform: uppercase;
-}
-
-.wordmark-copy small {
-    margin-top: 5px;
-    color: var(--faint);
 }
 
 .top-actions {
@@ -251,35 +210,6 @@ input:focus-visible,
     filter: saturate(1) contrast(1.02);
 }
 
-.profile-visual figcaption {
-    position: absolute;
-    right: 24px;
-    bottom: 24px;
-    left: 24px;
-    z-index: 2;
-    min-height: 38px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 0 12px;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    border-radius: 4px;
-    color: var(--paper);
-    background: rgba(21, 21, 18, 0.84);
-    backdrop-filter: blur(12px);
-    font-family: var(--utility-font);
-    font-size: 0.62rem;
-}
-
-.live-dot {
-    width: 7px;
-    height: 7px;
-    flex: 0 0 7px;
-    border-radius: 50%;
-    background: var(--mint);
-    box-shadow: 0 0 0 4px rgba(139, 216, 189, 0.14);
-}
-
 .hero-copy {
     min-width: 0;
 }
@@ -303,7 +233,7 @@ h1 {
     margin: 24px 0 18px;
     font-family: var(--display-font);
     font-size: 76px;
-    font-weight: 900;
+    font-weight: 700;
     line-height: 0.9;
     letter-spacing: 0;
 }
@@ -323,7 +253,7 @@ h1 {
     color: var(--accent);
     font-family: var(--body-font);
     font-size: 1.85rem;
-    font-weight: 500;
+    font-weight: 600;
     line-height: 1.25;
     overflow-wrap: anywhere;
 }
@@ -334,6 +264,7 @@ h1 {
     margin-bottom: 26px;
     color: var(--muted);
     font-size: 0.98rem;
+    font-weight: 400;
     line-height: 1.75;
 }
 
@@ -463,6 +394,7 @@ h1 {
     background: transparent;
     font-family: var(--body-font);
     font-size: 1rem;
+    font-weight: 500;
 }
 
 .search-box input::placeholder {
@@ -527,7 +459,7 @@ h1 {
 .section-heading h2 {
     font-family: var(--display-font);
     font-size: 2rem;
-    font-weight: 800;
+    font-weight: 700;
     line-height: 1.05;
     letter-spacing: 0;
 }
@@ -624,6 +556,14 @@ h1 {
 .card-copy strong {
     font-size: 1rem;
     font-weight: 600;
+}
+
+.card-copy small {
+    margin-top: 5px;
+    color: var(--mint);
+    font-family: var(--utility-font);
+    font-size: 0.68rem;
+    font-weight: 500;
 }
 
 .card-arrow {
@@ -986,16 +926,6 @@ footer {
         min-height: 70px;
     }
 
-    .wordmark-mark {
-        width: 32px;
-        height: 32px;
-        flex-basis: 32px;
-    }
-
-    .wordmark-copy small {
-        display: none;
-    }
-
     .hero {
         min-height: 0;
         grid-template-columns: 1fr;
@@ -1014,12 +944,6 @@ footer {
 
     .profile-visual::before {
         inset: 9px;
-    }
-
-    .profile-visual figcaption {
-        right: 18px;
-        bottom: 18px;
-        left: 18px;
     }
 
     h1 {
@@ -1114,10 +1038,6 @@ footer {
 @media (max-width: 420px) {
     .container {
         width: calc(100% - 28px);
-    }
-
-    .wordmark-copy strong {
-        font-size: 0.8rem;
     }
 
     .icon-link {
