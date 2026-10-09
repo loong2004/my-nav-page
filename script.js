@@ -60,7 +60,6 @@ const searchEngines = {
 
 const commandRoutes = {
     '/blog': 'https://monki.de5.net',
-    '/video': 'https://video.885123.xyz',
     '/pic': 'https://pic.soomin.de5.net',
     '/news': 'https://news.885123.xyz'
 };
