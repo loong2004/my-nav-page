@@ -1,53 +1,119 @@
-// 1. 背景设置 (每次刷新随机 + 大陆优先 + 加载失败兜底)
-function setFixedBackground() {
-    const background = document.querySelector('.background');
-    if (!background) return;
+// 背景粒子系统
+function initParticles() {
+    const canvas = document.getElementById('particles-canvas');
+    if (!canvas) return;
 
-    // 首选国内可访问随机源，刷新时附加随机参数规避缓存
-    const randomSources = [
-        'https://api.paugram.com/wallpaper/?source=sm',
-        'https://api.paugram.com/wallpaper/?source=gh',
-        'https://api.paugram.com/wallpaper/?source=360'
-    ];
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let animationId;
 
-    // 随机源异常时的静态兜底，保证始终有背景
-    const fallbackSources = [
-        'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1920&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1920&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?q=80&w=1920&auto=format&fit=crop'
-    ];
+    // 设置画布大小
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
 
-    const pickOne = (arr) => arr[Math.floor(Math.random() * arr.length)];
-    const cacheBuster = `t=${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-    const randomEndpoint = pickOne(randomSources);
-    const primaryUrl = `${randomEndpoint}${randomEndpoint.includes('?') ? '&' : '?'}${cacheBuster}`;
-    const fallbackUrl = pickOne(fallbackSources);
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
-    function preloadAndApply(url, onError) {
-        const img = new Image();
-        img.src = url;
+    // 粒子类
+    class Particle {
+        constructor() {
+            this.reset();
+            this.y = Math.random() * canvas.height;
+            this.opacity = Math.random() * 0.5 + 0.2;
+        }
 
-        img.onload = function() {
-            background.style.backgroundImage = `url('${url}')`;
-            background.style.opacity = '1';
-        };
+        reset() {
+            this.x = Math.random() * canvas.width;
+            this.y = -10;
+            this.vx = (Math.random() - 0.5) * 0.5;
+            this.vy = Math.random() * 0.3 + 0.2;
+            this.size = Math.random() * 2 + 1;
+            this.opacity = Math.random() * 0.5 + 0.2;
+            // 随机颜色：青色或粉色
+            this.color = Math.random() > 0.5 ? '61, 217, 235' : '232, 74, 158';
+        }
 
-        img.onerror = function() {
-            if (typeof onError === 'function') onError();
-        };
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
 
-        if (img.complete && img.naturalWidth > 0) {
-            background.style.backgroundImage = `url('${url}')`;
-            background.style.opacity = '1';
+            // 边界检查
+            if (this.y > canvas.height + 10) {
+                this.reset();
+            }
+            if (this.x < -10 || this.x > canvas.width + 10) {
+                this.x = Math.random() * canvas.width;
+            }
+        }
+
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${this.color}, ${this.opacity})`;
+            ctx.fill();
+
+            // 添加发光效果
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = `rgba(${this.color}, ${this.opacity * 0.8})`;
+            ctx.fill();
+            ctx.shadowBlur = 0;
         }
     }
 
-    preloadAndApply(primaryUrl, function() {
-        preloadAndApply(fallbackUrl, function() {
-            background.style.backgroundImage = 'linear-gradient(120deg, #0f172a 0%, #1e293b 55%, #0b1120 100%)';
-            background.style.opacity = '1';
+    // 创建粒子
+    const particleCount = Math.min(Math.floor((canvas.width * canvas.height) / 15000), 100);
+    for (let i = 0; i < particleCount; i++) {
+        particles.push(new Particle());
+    }
+
+    // 连接线
+    function drawConnections() {
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < 150) {
+                    const opacity = (1 - distance / 150) * 0.15;
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.strokeStyle = `rgba(196, 181, 232, ${opacity})`;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+            }
+        }
+    }
+
+    // 动画循环
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 更新和绘制粒子
+        particles.forEach(particle => {
+            particle.update();
+            particle.draw();
         });
-    });
+
+        // 绘制连接线
+        drawConnections();
+
+        animationId = requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    // 清理函数
+    return () => {
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+        }
+        window.removeEventListener('resize', resizeCanvas);
+    };
 }
 
 // 2. 搜索配置 (Tab 键循环切换)
@@ -448,7 +514,10 @@ function checkNetworkStatus() {
         if (!networkSection || !networkToggle) return;
         networkSection.classList.toggle('is-collapsed', isCollapsed);
         networkToggle.setAttribute('aria-expanded', String(!isCollapsed));
-        networkToggle.innerText = isCollapsed ? 'DETAILS' : 'HIDE';
+        const toggleText = networkToggle.querySelector('span');
+        if (toggleText) {
+            toggleText.innerText = isCollapsed ? 'SHOW' : 'HIDE';
+        }
     }
 
     if (networkToggle && networkSection) {
@@ -574,7 +643,7 @@ window.addEventListener('load', function() {
 });
 
 // 初始化
-setFixedBackground(); // 改名调用新函数：设置固定背景
+initParticles(); // 启动粒子系统
 selectEngine(currentEngine);
 setInterval(updateClock, 1000);
 updateClock();
@@ -584,7 +653,7 @@ fetchGithubStars();
 checkNetworkStatus(); // 启动网络监测
 
 console.log(
-    "%c Loong's Terminal %c System Ready ",
-    "background:#06b6d4; color:#000; font-weight:bold; border-radius: 4px 0 0 4px; padding: 4px;",
-    "background:#0f172a; color:#06b6d4; font-weight:bold; border: 1px solid #06b6d4; border-radius: 0 4px 4px 0; padding: 3px;"
+    "%c ⚡ LOONG'S TERMINAL %c SYSTEM READY ",
+    "background: linear-gradient(135deg, #3dd9eb, #e84a9e); color: #1a0f2e; font-weight: bold; font-size: 14px; padding: 8px 12px; border-radius: 4px 0 0 4px;",
+    "background: #1a0f2e; color: #3dd9eb; font-weight: bold; font-size: 14px; border: 2px solid #3dd9eb; padding: 6px 12px; border-radius: 0 4px 4px 0;"
 );

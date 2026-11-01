@@ -17,15 +17,14 @@
 
     <link rel="preconnect" href="https://api.paugram.com">
     <link rel="preconnect" href="https://npm.elemecdn.com">
-    <link rel="preconnect" href="https://cdn.bootcdn.net">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="preconnect" href="https://ghchart.rshah.org">
     <link rel="preconnect" href="https://images.unsplash.com">
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/noto-sans-sc@5.2.8/index.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/manrope@5.2.8/index.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/jetbrains-mono@5.2.8/index.css">
-    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/inter@5/index.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/noto-sans-sc@5/index.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/jetbrains-mono@5/index.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css">
     <link rel="stylesheet" href="https://npm.elemecdn.com/aplayer/dist/APlayer.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="./avatar.jpg">
@@ -33,27 +32,8 @@
     <style>
         body {
             margin: 0;
-            color: #f2f0e9;
-            background: #151512;
-        }
-
-        .background,
-        .grid-overlay {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-        }
-
-        .background {
-            z-index: -2;
-            background-position: center;
-            background-size: cover;
-            opacity: 0;
-        }
-
-        .grid-overlay {
-            z-index: -1;
-            background: rgba(16, 16, 13, 0.91);
+            color: #f5f3ff;
+            background: linear-gradient(135deg, #1a0f2e 0%, #2d1b4e 50%, #4a2c6d 100%);
         }
 
         #preloader {
@@ -62,8 +42,8 @@
             z-index: 9999;
             display: grid;
             place-items: center;
-            background: #151512;
-            transition: opacity 0.35s ease, visibility 0.35s ease;
+            background: linear-gradient(135deg, #1a0f2e 0%, #2d1b4e 50%, #4a2c6d 100%);
+            transition: opacity 0.5s ease, visibility 0.5s ease;
         }
 
         #preloader.hidden {
@@ -81,13 +61,12 @@
         </div>
     </div>
 
-    <div class="background"></div>
-    <div class="grid-overlay"></div>
+    <canvas id="particles-canvas"></canvas>
 
     <main class="container">
         <nav class="topbar" aria-label="主导航">
             <div class="top-actions">
-                <a href="mailto:monki@monki.de5.net" class="icon-link" aria-label="发送邮件" title="Email">
+                <a href="mailto:admin@885123.xyz" class="icon-link" aria-label="发送邮件" title="Email">
                     <i class="fa-regular fa-envelope"></i>
                 </a>
                 <a href="https://github.com/loong2004/my-nav-page" target="_blank" rel="noopener noreferrer" class="github-star-btn">
@@ -107,12 +86,12 @@
 
             <div class="hero-copy">
                 <div class="hero-utility">
-                    <span>WELCOME TO MY SPACE</span>
+                    <span>SYSTEM ONLINE</span>
                     <time id="clock">00:00:00</time>
                 </div>
 
                 <h1 id="hero-title">
-                    <span class="brand-name">LOONG.</span>
+                    <span class="brand-name">LOONG</span>
                     <span id="greeting">你好</span>
                 </h1>
 
@@ -149,26 +128,38 @@
             <div class="section-heading">
                 <div>
                     <span class="section-kicker">QUICK ACCESS</span>
-                    <h2 id="destinations-title">我的空间</h2>
+                    <h2 id="destinations-title">快捷入口</h2>
                 </div>
-                <span class="section-count">03 DESTINATIONS</span>
+                <span class="section-count">03 LINKS</span>
             </div>
 
             <div class="cards-grid">
                 <a href="https://monki.de5.net" target="_blank" rel="noopener noreferrer" class="card card-blog">
                     <span class="card-icon"><i class="fas fa-rss" aria-hidden="true"></i></span>
-                    <span class="card-copy"><strong>个人博客</strong></span>
-                    <i class="fas fa-arrow-up-right-from-square card-arrow" aria-hidden="true"></i>
+                    <div class="card-copy">
+                        <strong>个人博客</strong>
+                        <span class="card-arrow">
+                            <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                        </span>
+                    </div>
                 </a>
                 <a href="https://pic.soomin.de5.net" target="_blank" rel="noopener noreferrer" class="card card-image">
                     <span class="card-icon"><i class="far fa-image" aria-hidden="true"></i></span>
-                    <span class="card-copy"><strong>个人图床</strong></span>
-                    <i class="fas fa-arrow-up-right-from-square card-arrow" aria-hidden="true"></i>
+                    <div class="card-copy">
+                        <strong>个人图床</strong>
+                        <span class="card-arrow">
+                            <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                        </span>
+                    </div>
                 </a>
                 <a href="https://news.885123.xyz" target="_blank" rel="noopener noreferrer" class="card card-news">
                     <span class="card-icon"><i class="far fa-newspaper" aria-hidden="true"></i></span>
-                    <span class="card-copy"><strong>每日热点</strong></span>
-                    <i class="fas fa-arrow-up-right-from-square card-arrow" aria-hidden="true"></i>
+                    <div class="card-copy">
+                        <strong>每日热点</strong>
+                        <span class="card-arrow">
+                            <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                        </span>
+                    </div>
                 </a>
             </div>
         </section>
@@ -176,7 +167,7 @@
         <section class="github-section" aria-labelledby="github-title">
             <div class="section-heading compact-heading">
                 <div>
-                    <span class="section-kicker">BUILD IN PUBLIC</span>
+                    <span class="section-kicker">CONTRIBUTIONS</span>
                     <h2 id="github-title">代码足迹</h2>
                 </div>
                 <a href="https://github.com/loong2004" target="_blank" rel="noopener noreferrer" class="text-link">
@@ -184,30 +175,30 @@
                 </a>
             </div>
             <div class="github-graph-container">
-                <img src="https://ghchart.rshah.org/ff6b3d/loong2004" alt="Loong 的 GitHub 贡献图" class="gh-chart" loading="lazy" decoding="async">
+                <img src="https://ghchart.rshah.org/3dd9eb/loong2004" alt="Loong 的 GitHub 贡献图" class="gh-chart" loading="lazy" decoding="async">
             </div>
         </section>
 
         <section class="network-section" id="network-section" aria-labelledby="network-title-text">
             <div class="section-heading compact-heading network-title">
                 <div>
-                    <span class="section-kicker">LIVE CONNECTIONS</span>
-                    <h2 id="network-title-text">网络状态</h2>
+                    <span class="section-kicker">LIVE STATUS</span>
+                    <h2 id="network-title-text">网络监控</h2>
                 </div>
                 <button id="network-toggle" class="network-toggle" type="button" aria-expanded="true" aria-controls="network-grid">
-                    <span>收起</span>
+                    <span>HIDE</span>
                     <i class="fas fa-chevron-up" aria-hidden="true"></i>
                 </button>
             </div>
-            <div id="network-summary" class="network-summary" aria-live="polite">8 个节点等待响应</div>
+            <div id="network-summary" class="network-summary" aria-live="polite">8 个节点待检测</div>
             <div class="connectivity-grid" id="network-grid"></div>
         </section>
 
         <footer>
-            <p>&copy; 2026 Loong. Built for the open web.</p>
+            <p>&copy; 2026 Loong · Built with passion</p>
             <div class="footer-links">
                 <a href="https://github.com/loong2004" target="_blank" rel="noopener noreferrer">GitHub</a>
-                <a href="mailto:monki@monki.de5.net">Email</a>
+                <a href="mailto:admin@885123.xyz">Email</a>
             </div>
         </footer>
     </main>
