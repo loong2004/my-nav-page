@@ -1099,27 +1099,36 @@ footer {
     min-height: 100px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 24px;
+    justify-content: center;
     padding: 40px 0;
-    color: var(--text-muted);
-    font-family: var(--mono-font);
-    font-size: 12px;
 }
 
 .footer-links {
     display: flex;
-    gap: 24px;
+    gap: 16px;
 }
 
-.footer-links a {
+.footer-icon-link {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(45, 27, 78, 0.3);
+    backdrop-filter: blur(10px);
     color: var(--text-secondary);
+    font-size: 18px;
     text-decoration: none;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.footer-links a:hover {
-    color: var(--accent-cyan);
+.footer-icon-link:hover {
+    transform: translateY(-4px);
+    border-color: var(--bright-cyan);
+    background: rgba(61, 217, 235, 0.15);
+    color: var(--bright-cyan);
+    box-shadow: 0 8px 24px var(--glow-cyan);
 }
 
 .loader {
