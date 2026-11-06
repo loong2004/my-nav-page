@@ -470,46 +470,196 @@ function fetchGithubStars() {
         });
 }
 
-// 7. 网络状态监控 (Refined: 动态生成 + 实时心跳 + 呼吸感监测)
-function checkNetworkStatus() {
+// 7. 延迟测试功能 (纯前端 RTT 测量)
+function startLatencyTest() {
+    // ========== 配置 ==========
+    const LATENCY_CONFIG = {
+        count: 16,                    // 滑动窗口采样点数
+        probeTimeoutMs: 5000,         // 单次探测超时
+        refreshIntervalMs: 1236,      // 持续刷新间隔 (618*2)
+        waitVisiblePollMs: 300,       // 页签可见性轮询间隔
+        chartMaxMs: 500               // 折线图 Y 轴上限
+    };
+
+    // 探针站点配置 (国内优先)
+    const LATENCY_SITES = [
+        // 国内
+        { name: 'Bilibili', region: '国内', icon: 'fab fa-bilibili', url: 'https://www.bilibili.com/favicon.ico' },
+        { name: '微信', region: '国内', icon: 'fab fa-weixin', url: 'https://weixin.qq.com/favicon.ico' },
+        { name: '淘宝', region: '国内', icon: 'fas fa-shopping-bag', url: 'https://www.taobao.com/favicon.ico' },
+        { name: '字节跳动', region: '国内', icon: 'fab fa-tiktok', url: 'https://www.douyin.com/favicon.ico' },
+        // 国际
+        { name: 'GitHub', region: '国际', icon: 'fab fa-github', url: 'https://github.githubassets.com/favicon.ico' },
+        { name: 'jsDelivr', region: '国际', icon: 'fas fa-cube', url: 'https://cdn.jsdelivr.net/npm/latency-test@1.0.0/generate_204' },
+        { name: 'Cloudflare', region: '国际', icon: 'fas fa-cloud', url: 'https://www.cloudflare.com/favicon.ico' },
+        { name: 'YouTube', region: '国际', icon: 'fab fa-youtube', url: 'https://www.youtube.com/favicon.ico' }
+    ];
+
     const grid = document.getElementById('network-grid');
     const networkSection = document.getElementById('network-section');
     const networkToggle = document.getElementById('network-toggle');
     const networkSummary = document.getElementById('network-summary');
-    
-    // 配置列表
-    const targets = [
-        { id: 'bytedance', name: '字节跳动', icon: 'fab fa-tiktok', type: 'cn', url: 'https://www.douyin.com/favicon.ico' },
-        { id: 'bilibili', name: 'Bilibili', icon: 'fab fa-bilibili', type: 'cn', url: 'https://www.bilibili.com/favicon.ico' },
-        { id: 'wechat', name: '微信', icon: 'fab fa-weixin', type: 'cn', url: 'https://weixin.qq.com/favicon.ico' },
-        { id: 'taobao', name: '淘宝', icon: 'fas fa-shopping-bag', type: 'cn', url: 'https://www.taobao.com/favicon.ico' },
-        { id: 'github', name: 'GitHub', icon: 'fab fa-github', type: 'intl', url: 'https://github.com/favicon.ico' },
-        { id: 'jsdelivr', name: 'jsDelivr', icon: 'fas fa-cube', type: 'intl', url: 'https://cdn.jsdelivr.net/favicon.ico' },
-        { id: 'cloudflare', name: 'Cloudflare', icon: 'fas fa-cloud', type: 'intl', url: 'https://www.cloudflare.com/favicon.ico' },
-        { id: 'youtube', name: 'YouTube', icon: 'fab fa-youtube', type: 'intl', url: 'https://www.youtube.com/favicon.ico' }
-    ];
 
-    // 1. 动态生成卡片 (DRY)
-    if (grid) {
-        grid.innerHTML = targets.map(t => `
-            <div class="net-card">
-                <div class="net-header">
-                    <span class="net-icon"><i class="${t.icon}"></i> ${t.name}</span>
-                    <span class="net-badge badge-${t.type}">${t.type === 'cn' ? '国内' : '国际'}</span>
-                </div>
-                <div class="net-body">
-                    <span class="net-latency" id="ping-${t.id}">PING</span>
-                    <div class="status-dots" id="status-${t.id}">
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                    </div>
-                </div>
-            </div>
-        `).join('');
+    if (!grid) return;
+
+    // 站点延迟数据存储 {siteId: [latency1, latency2, ...]}
+    const siteLatencies = {};
+
+    // ========== 核心测速函数 ==========
+    async function testLatency(site) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), LATENCY_CONFIG.probeTimeoutMs);
+        const start = performance.now();
+
+        try {
+            const sep = site.url.includes('?') ? '&' : '?';
+            const probeUrl = `${site.url}${sep}t=${Date.now()}${Math.random().toString(36).slice(2, 8)}`;
+
+            await fetch(probeUrl, {
+                method: 'HEAD',
+                cache: 'no-store',
+                mode: 'no-cors',
+                referrerPolicy: 'no-referrer',
+                signal: controller.signal
+            });
+
+            return Math.round(performance.now() - start);
+        } catch {
+            return -1;
+        } finally {
+            clearTimeout(timeoutId);
+        }
     }
 
-    if (networkSummary) networkSummary.innerText = `NETWORK: ${targets.length} NODES STANDBY`;
+    // ========== 页签可见性检测 ==========
+    function isLatencyPageVisible() {
+        return !document.hidden && networkSection && !networkSection.classList.contains('is-collapsed');
+    }
 
+    function waitForVisiblePage() {
+        if (isLatencyPageVisible()) return Promise.resolve();
+        return new Promise(resolve => {
+            const timer = setInterval(() => {
+                if (isLatencyPageVisible()) {
+                    clearInterval(timer);
+                    resolve();
+                }
+            }, LATENCY_CONFIG.waitVisiblePollMs);
+        });
+    }
+
+    // ========== UI 生成 ==========
+    function generateLatencyCards() {
+        grid.innerHTML = LATENCY_SITES.map(site => {
+            const id = site.name.toLowerCase().replace(/\s+/g, '-');
+            return `
+                <div class="net-card">
+                    <div class="net-header">
+                        <span class="net-icon"><i class="${site.icon}"></i> ${site.name}</span>
+                        <span class="net-badge badge-${site.region === '国内' ? 'cn' : 'intl'}">${site.region}</span>
+                    </div>
+                    <div class="net-body">
+                        <span class="net-latency" id="latency-${id}">PING</span>
+                        <svg class="latency-chart" width="100%" height="40" id="chart-${id}">
+                            <path id="path-${id}" fill="none" stroke="rgba(61, 217, 235, 0.6)" stroke-width="2"></path>
+                            <circle id="cursor-${id}" r="3" fill="var(--bright-cyan)" opacity="0"></circle>
+                        </svg>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ========== 颜色分档 ==========
+    function getLatencyColor(latency) {
+        if (latency === -1) return { class: 'red', css: 'var(--status-red)' };
+        if (latency <= 49) return { class: 'green', css: 'var(--status-green)' };
+        if (latency <= 149) return { class: 'green', css: 'var(--status-green)' };
+        if (latency <= 299) return { class: 'yellow', css: 'var(--status-yellow)' };
+        if (latency <= 999) return { class: 'red', css: 'var(--status-red)' };
+        return { class: 'red', css: 'var(--status-red)' };
+    }
+
+    // ========== UI 更新 (数值 + 折线图) ==========
+    function updateLatencyDisplay(site) {
+        const id = site.name.toLowerCase().replace(/\s+/g, '-');
+        const latencies = siteLatencies[id] || [];
+        if (latencies.length === 0) return;
+
+        const textElem = document.getElementById(`latency-${id}`);
+        const pathElem = document.getElementById(`path-${id}`);
+        const cursorElem = document.getElementById(`cursor-${id}`);
+
+        if (!textElem || !pathElem || !cursorElem) return;
+
+        // 计算有效样本平均值
+        const validSamples = latencies.filter(l => l !== -1);
+        const lastLatency = latencies[latencies.length - 1];
+
+        let displayValue, color;
+        if (validSamples.length === 0 && lastLatency === -1) {
+            displayValue = 'TIMEOUT';
+            color = getLatencyColor(-1);
+        } else if (validSamples.length > 0) {
+            const avg = validSamples.reduce((sum, l) => sum + l, 0) / validSamples.length;
+            displayValue = `${Math.round(avg)}ms`;
+            color = getLatencyColor(Math.round(avg));
+        } else {
+            displayValue = 'PING';
+            color = getLatencyColor(-1);
+        }
+
+        // 更新数值
+        textElem.innerText = displayValue;
+        textElem.className = `net-latency text-${color.class}`;
+
+        // 绘制折线图
+        const chartWidth = pathElem.parentElement.clientWidth || 200;
+        const chartHeight = 40;
+        const points = latencies.slice(-LATENCY_CONFIG.count);
+
+        if (points.length < 2) return;
+
+        const xStep = chartWidth / (LATENCY_CONFIG.count - 1);
+        let pathData = '';
+
+        points.forEach((l, i) => {
+            const x = i * xStep;
+            let y;
+            if (l === -1) {
+                y = chartHeight; // 失败贴底
+            } else {
+                const clampedL = Math.min(l, LATENCY_CONFIG.chartMaxMs);
+                y = chartHeight - (clampedL / LATENCY_CONFIG.chartMaxMs) * chartHeight;
+            }
+
+            if (i === 0) {
+                pathData = `M ${x} ${y}`;
+            } else {
+                // 中点二次贝塞尔平滑
+                const prevX = (i - 1) * xStep;
+                const prevY = parseFloat(pathData.split(' ').slice(-1)[0]);
+                const midX = (prevX + x) / 2;
+                const midY = (prevY + y) / 2;
+                pathData += ` Q ${prevX} ${prevY}, ${midX} ${midY}`;
+                if (i === points.length - 1) {
+                    pathData += ` T ${x} ${y}`;
+                }
+            }
+
+            // 更新光标位置到最后一点
+            if (i === points.length - 1) {
+                cursorElem.setAttribute('cx', x);
+                cursorElem.setAttribute('cy', y);
+                cursorElem.setAttribute('opacity', '1');
+            }
+        });
+
+        pathElem.setAttribute('d', pathData);
+        pathElem.setAttribute('stroke', color.css);
+    }
+
+    // ========== 折叠控制 ==========
     function setNetworkCollapsed(isCollapsed) {
         if (!networkSection || !networkToggle) return;
         networkSection.classList.toggle('is-collapsed', isCollapsed);
@@ -528,94 +678,60 @@ function checkNetworkStatus() {
         });
     }
 
-    // 2. 渲染信号灯 (Helper)
-    const renderStatusDots = (latency, elem) => {
-        let colorClass = 'green';
-        let activeCount = 6;
+    // ========== 主流程：初始采样 + 持续刷新 ==========
+    async function runLatencyTest() {
+        generateLatencyCards();
 
-        if (latency === -1) { // Timeout/Error
-            colorClass = 'red';
-            activeCount = 1;
-        } else if (latency < 100) {
-            colorClass = 'green';
-            activeCount = 6;
-        } else if (latency < 250) {
-            colorClass = 'yellow';
-            activeCount = 4;
-        } else {
-            colorClass = 'red';
-            activeCount = 2;
+        if (networkSummary) {
+            networkSummary.innerText = `NETWORK: ${LATENCY_SITES.length} NODES SAMPLING`;
         }
 
-        let html = '';
-        for (let i = 0; i < 6; i++) {
-            const isActive = i < activeCount;
-            const className = isActive ? `dot ${colorClass}` : 'dot';
-            html += `<div class="${className}"></div>`;
-        }
-        elem.innerHTML = html;
-        return colorClass;
-    };
+        // 初始化每个站点的数据数组
+        LATENCY_SITES.forEach(site => {
+            const id = site.name.toLowerCase().replace(/\s+/g, '-');
+            siteLatencies[id] = [];
+        });
 
-    // 3. 核心测速函数 (单次)
-    const pingTarget = async (target) => {
-        const textElem = document.getElementById(`ping-${target.id}`);
-        const dotsElem = document.getElementById(`status-${target.id}`);
-        if (!textElem || !dotsElem) return;
+        // 首轮采样 (各站点并行，站内串行)
+        await Promise.all(LATENCY_SITES.map(async site => {
+            const id = site.name.toLowerCase().replace(/\s+/g, '-');
 
-        const onePing = async () => {
-            const start = performance.now();
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 3000); // 3秒超时
-
-            try {
-                // mode: 'no-cors' 是必须的，cache: 'no-store' 加上时间戳强制不缓存
-                await fetch(`${target.url}?t=${Date.now()}`, {
-                    mode: 'no-cors',
-                    cache: 'no-store',
-                    signal: controller.signal
-                });
-                const end = performance.now();
-                const jitter = Math.floor(Math.random() * 5);
-                return Math.round(end - start) + jitter;
-            } finally {
-                clearTimeout(timeoutId);
+            for (let i = 0; i < LATENCY_CONFIG.count; i++) {
+                await waitForVisiblePage();
+                const latency = await testLatency(site);
+                siteLatencies[id].push(latency);
+                updateLatencyDisplay(site);
+                await new Promise(resolve => setTimeout(resolve, 0)); // 让出事件循环
             }
-        };
+        }));
 
-        try {
-            let latency;
-            try {
-                latency = await onePing();
-            } catch {
-                latency = await onePing(); // 轻量重试一次
-            }
-
-            textElem.innerText = `${latency}ms`;
-            textElem.title = 'Estimated latency';
-            const color = renderStatusDots(latency, dotsElem);
-            textElem.className = `net-latency text-${color}`;
-            if (networkSummary) networkSummary.innerText = `NETWORK: ${targets.length} NODES MONITORING`;
-        } catch {
-            textElem.innerText = 'OFF';
-            textElem.className = 'net-latency text-red';
-            textElem.title = 'Connectivity unavailable';
-            renderStatusDots(-1, dotsElem);
+        if (networkSummary) {
+            networkSummary.innerText = `NETWORK: ${LATENCY_SITES.length} NODES MONITORING`;
         }
-    };
 
-    // 4. 启动无限循环 (Heartbeat Loop)
-    targets.forEach(target => {
-        const loop = async () => {
-            await pingTarget(target);
-            
-            // 放慢刷新节奏，减少延迟数字频繁跳动造成的视觉噪音
-            const nextDelay = Math.floor(Math.random() * 7000) + 8000; 
-            setTimeout(loop, nextDelay);
-        };
-        
-        // 错峰启动，防止页面刚加载时瞬间卡顿
-        setTimeout(loop, Math.random() * 1000);
+        // 持续刷新
+        setInterval(async () => {
+            if (!isLatencyPageVisible()) return; // 页签不可见则跳过
+
+            await Promise.all(LATENCY_SITES.map(async site => {
+                const id = site.name.toLowerCase().replace(/\s+/g, '-');
+                const latency = await testLatency(site);
+
+                siteLatencies[id].push(latency);
+                if (siteLatencies[id].length > LATENCY_CONFIG.count) {
+                    siteLatencies[id].shift(); // 移除最旧样本
+                }
+
+                updateLatencyDisplay(site);
+            }));
+        }, LATENCY_CONFIG.refreshIntervalMs);
+    }
+
+    runLatencyTest().catch(err => {
+        console.error('Latency test failed:', err);
+        if (networkSummary) {
+            networkSummary.innerText = 'NETWORK: ERROR';
+        }
     });
 }
 
@@ -650,7 +766,13 @@ updateClock();
 fetchHitokoto();
 fetchWeather();
 fetchGithubStars();
-checkNetworkStatus(); // 启动网络监测
+
+// 启动延迟测试 (使用 DOM ready 检测确保在正确时机运行)
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startLatencyTest);
+} else {
+    startLatencyTest();
+}
 
 console.log(
     "%c ⚡ LOONG'S TERMINAL %c SYSTEM READY ",

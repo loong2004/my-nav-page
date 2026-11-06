@@ -904,7 +904,7 @@ h1 {
 .net-card {
     position: relative;
     min-width: 0;
-    height: 140px;
+    height: 160px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -1012,11 +1012,31 @@ h1 {
 
 .net-latency {
     font-family: var(--mono-font);
-    font-size: 24px;
+    font-size: 20px;
     font-variant-numeric: tabular-nums;
     font-weight: 800;
     letter-spacing: -0.03em;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.latency-chart {
+    width: 100%;
+    height: 40px;
+    margin-top: 8px;
+    opacity: 0.9;
+    transition: opacity 0.3s ease;
+}
+
+.net-card:hover .latency-chart {
+    opacity: 1;
+}
+
+.latency-chart path {
+    transition: stroke 0.4s ease;
+}
+
+.latency-chart circle {
+    transition: all 0.3s ease;
 }
 
 .status-dots {
