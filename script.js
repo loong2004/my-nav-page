@@ -484,13 +484,13 @@ function startLatencyTest() {
     // 探针站点配置 (国内优先)
     const LATENCY_SITES = [
         // 国内
-        { name: 'Bilibili', region: '国内', icon: 'fab fa-bilibili', url: 'https://www.bilibili.com/favicon.ico' },
+        { name: 'Bilibili', region: '国内', icon: 'fab fa-bilibili', url: 'https://i0.hdslb.com/bfs/face/member/noface.jpg' },
         { name: '微信', region: '国内', icon: 'fab fa-weixin', url: 'https://weixin.qq.com/favicon.ico' },
         { name: '淘宝', region: '国内', icon: 'fas fa-shopping-bag', url: 'https://www.taobao.com/favicon.ico' },
-        { name: '字节跳动', region: '国内', icon: 'fab fa-tiktok', url: 'https://www.douyin.com/favicon.ico' },
+        { name: '字节跳动', region: '国内', icon: 'fab fa-tiktok', url: 'https://lf3-cdn-tos.bytegoofy.com/goofy/ies/douyin_web/public/favicon.ico' },
         // 国际
         { name: 'GitHub', region: '国际', icon: 'fab fa-github', url: 'https://github.githubassets.com/favicon.ico' },
-        { name: 'jsDelivr', region: '国际', icon: 'fas fa-cube', url: 'https://cdn.jsdelivr.net/npm/latency-test@1.0.0/generate_204' },
+        { name: 'jsDelivr', region: '国际', icon: 'fas fa-cube', url: 'https://cdn.jsdelivr.net/npm/latency-test@1.0.0/generate_200' },
         { name: 'Cloudflare', region: '国际', icon: 'fas fa-cloud', url: 'https://www.cloudflare.com/favicon.ico' },
         { name: 'YouTube', region: '国际', icon: 'fab fa-youtube', url: 'https://www.youtube.com/favicon.ico' }
     ];
