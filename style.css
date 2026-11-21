@@ -1185,8 +1185,13 @@ footer {
     padding: var(--np-pad);
 }
 
+/* 收起时面板只剩唱片可点，其余透明区域不挡住页面 */
 .np:not(.is-expanded) .np-panel {
     pointer-events: none;
+}
+
+.np-disc {
+    pointer-events: auto;
 }
 
 .np-panel > :not(.np-shell) {
@@ -1536,17 +1541,6 @@ footer {
     border-radius: 50%;
     object-fit: cover;
     box-shadow: 0 0 0 2px #0b0512;
-}
-
-/* 中心轴孔 */
-.np-vinyl::after {
-    content: "";
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #0b0512;
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25);
 }
 
 /* 固定不转的高光，让旋转更有质感 */
