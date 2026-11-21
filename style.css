@@ -26,13 +26,6 @@
     font-display: swap;
 }
 
-@supports (font-variation-settings: normal) {
-    :root {
-        --display-font: "Inter Variable", "Noto Sans SC Variable", -apple-system, sans-serif;
-        --body-font: "Inter Variable", "Noto Sans SC Variable", -apple-system, sans-serif;
-    }
-}
-
 * {
     box-sizing: border-box;
     margin: 0;
@@ -138,14 +131,6 @@ input:focus-visible,
     outline: 2px solid var(--bright-cyan);
     outline-offset: 3px;
     border-radius: 2px;
-}
-
-.background {
-    display: none;
-}
-
-.grid-overlay {
-    display: none;
 }
 
 #particles-canvas {
@@ -1039,55 +1024,6 @@ h1 {
     transition: all 0.3s ease;
 }
 
-.status-dots {
-    display: flex;
-    gap: 5px;
-    align-items: center;
-}
-
-.dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    transition: all 0.4s ease;
-    position: relative;
-}
-
-.dot::before {
-    content: "";
-    position: absolute;
-    inset: -4px;
-    border-radius: 50%;
-    background: inherit;
-    opacity: 0;
-    filter: blur(4px);
-    transition: opacity 0.4s ease;
-}
-
-.dot.green,
-.dot.yellow,
-.dot.red {
-    animation: pulse-dot 2s ease-in-out infinite;
-}
-
-.dot.green::before,
-.dot.yellow::before,
-.dot.red::before {
-    opacity: 0.6;
-}
-
-@keyframes pulse-dot {
-    0%, 100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-    50% {
-        transform: scale(1.2);
-        opacity: 0.8;
-    }
-}
-
 .text-green {
     color: var(--status-green);
 }
@@ -1098,21 +1034,6 @@ h1 {
 
 .text-red {
     color: var(--status-red);
-}
-
-.dot.green {
-    background: var(--status-green);
-    box-shadow: 0 0 12px var(--status-green);
-}
-
-.dot.yellow {
-    background: var(--status-yellow);
-    box-shadow: 0 0 12px var(--status-yellow);
-}
-
-.dot.red {
-    background: var(--status-red);
-    box-shadow: 0 0 12px var(--status-red);
 }
 
 footer {
@@ -1211,153 +1132,976 @@ footer {
     }
 }
 
-.aplayer {
-    color: var(--text-primary) !important;
-    background: rgba(45, 27, 78, 0.85) !important;
-    border: 1px solid var(--glass-border) !important;
-    border-radius: 20px !important;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6),
-                0 0 40px var(--glow-pink) !important;
-    backdrop-filter: blur(30px) !important;
-    font-family: var(--body-font) !important;
-    overflow: hidden !important;
+/* ==========================================================
+ * NEON DECK 音乐播放器
+ * 收起：旋转黑胶 + 霓虹进度环；展开：从唱片处圆形展开的 HUD 面板
+ * ========================================================== */
+.np {
+    --np-gap: 20px;
+    --np-disc: 84px;
+    --np-pad: 16px;
+    --np-center: calc(var(--np-pad) + var(--np-disc) / 2);
+    --np-surface: linear-gradient(160deg, rgba(48, 28, 84, 0.94) 0%, rgba(24, 13, 42, 0.96) 100%);
+    position: fixed;
+    left: var(--np-gap);
+    bottom: var(--np-gap);
+    z-index: 100;
+    width: 360px;
+    max-width: calc(100vw - var(--np-gap) * 2);
+    color: var(--text-primary);
+    font-family: var(--body-font);
+    pointer-events: none;
 }
 
-.aplayer.aplayer-fixed {
-    bottom: 20px !important;
-    left: 20px !important;
-    right: auto !important;
+.np > * {
+    pointer-events: auto;
 }
 
-.aplayer.aplayer-fixed .aplayer-body {
-    background: rgba(45, 27, 78, 0.92) !important;
-    border: 1px solid var(--glass-border) !important;
-    backdrop-filter: blur(30px) !important;
-    border-radius: 20px !important;
+:where(.np) button {
+    font: inherit;
+    color: inherit;
 }
 
-.aplayer .aplayer-list,
-.aplayer .aplayer-info {
-    border-color: var(--glass-border) !important;
+/* ---------- 主面板 ----------
+ * 外观（背景/边框/阴影）由独立的 .np-shell 承担，收起展开时改变它的真实几何尺寸，
+ * 边框和阴影全程完整，不会像 clip-path 遮罩那样被硬切。
+ *
+ * 收起：内容向唱片收拢淡出 → 顶边下压成胶囊 → 胶囊向唱片回缩成圆 → 落地果冻回弹 + 霓虹涟漪
+ * 展开：唱片按压 → 向右弹出胶囊 → 胶囊向上展开成面板 → 内容依次弹入
+ */
+.np-panel {
+    --np-shell-inset: calc(var(--np-pad) - 5px);
+    --np-shell-size: calc(var(--np-disc) + 10px);
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: var(--np-disc) minmax(0, 1fr);
+    grid-template-areas:
+        "head head"
+        "lyric lyric"
+        "disc info";
+    column-gap: 14px;
+    row-gap: 10px;
+    padding: var(--np-pad);
 }
 
-.aplayer .aplayer-list {
-    background: rgba(26, 15, 46, 0.95) !important;
-    backdrop-filter: blur(20px) !important;
+.np:not(.is-expanded) .np-panel {
+    pointer-events: none;
 }
 
-.aplayer .aplayer-list ol li {
-    border-color: rgba(255, 255, 255, 0.05) !important;
-    padding: 12px 16px !important;
-    transition: all 0.3s ease !important;
+.np-panel > :not(.np-shell) {
+    position: relative;
 }
 
-.aplayer .aplayer-list ol li:hover,
-.aplayer .aplayer-list ol li.aplayer-list-light {
-    background: rgba(61, 217, 235, 0.12) !important;
+.np-shell {
+    position: absolute;
+    z-index: 0;
+    /* 收起：贴合唱片的圆形底座 */
+    left: var(--np-shell-inset);
+    bottom: var(--np-shell-inset);
+    top: calc(100% - var(--np-shell-inset) - var(--np-shell-size));
+    right: calc(100% - var(--np-shell-inset) - var(--np-shell-size));
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: calc(var(--np-shell-size) / 2);
+    background: var(--np-surface);
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(61, 217, 235, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    /* 收起节奏：先压顶边成胶囊，再收右边回到唱片 */
+    transition:
+        top 0.38s cubic-bezier(0.6, 0, 0.2, 1) 0.06s,
+        bottom 0.38s cubic-bezier(0.6, 0, 0.2, 1) 0.06s,
+        border-radius 0.26s ease 0.06s,
+        right 0.44s cubic-bezier(0.7, 0, 0.15, 1) 0.18s,
+        left 0.44s cubic-bezier(0.7, 0, 0.15, 1) 0.18s,
+        box-shadow 0.4s ease;
 }
 
-.aplayer .aplayer-info .aplayer-music .aplayer-title,
-.aplayer .aplayer-list ol li .aplayer-list-title {
-    color: var(--text-primary) !important;
-    font-weight: 600 !important;
+.np.is-expanded .np-shell {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border-radius: 22px;
+    box-shadow:
+        0 18px 50px rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    /* 展开节奏：先向右弹出胶囊，再向上展开（弹簧曲线，不支持 linear() 的浏览器回退为回弹贝塞尔） */
+    transition:
+        right 0.55s cubic-bezier(0.34, 1.25, 0.64, 1),
+        left 0.55s cubic-bezier(0.34, 1.25, 0.64, 1),
+        top 0.6s cubic-bezier(0.34, 1.25, 0.64, 1) 0.12s,
+        bottom 0.6s cubic-bezier(0.34, 1.25, 0.64, 1) 0.12s,
+        border-radius 0.45s ease 0.14s,
+        box-shadow 0.4s ease;
+    transition:
+        right 0.6s linear(0, 0.0222, 0.0797, 0.1606, 0.2553, 0.3562, 0.4572, 0.5542, 0.644, 0.7249, 0.7957, 0.8563, 0.9067, 0.9476, 0.9798, 1.0043, 1.022, 1.0341, 1.0415, 1.0452, 1.046, 1.0446, 1.0417, 1.0379, 1.0334, 1.0288, 1.0241, 1.0197, 1.0157, 1.012, 1.0089, 1.0062, 1.0039, 1.0021, 1.0007, 0.9996, 0.9989, 0.9984, 0.9981, 0.9979, 1),
+        left 0.6s linear(0, 0.0222, 0.0797, 0.1606, 0.2553, 0.3562, 0.4572, 0.5542, 0.644, 0.7249, 0.7957, 0.8563, 0.9067, 0.9476, 0.9798, 1.0043, 1.022, 1.0341, 1.0415, 1.0452, 1.046, 1.0446, 1.0417, 1.0379, 1.0334, 1.0288, 1.0241, 1.0197, 1.0157, 1.012, 1.0089, 1.0062, 1.0039, 1.0021, 1.0007, 0.9996, 0.9989, 0.9984, 0.9981, 0.9979, 1),
+        top 0.65s linear(0, 0.0222, 0.0797, 0.1606, 0.2553, 0.3562, 0.4572, 0.5542, 0.644, 0.7249, 0.7957, 0.8563, 0.9067, 0.9476, 0.9798, 1.0043, 1.022, 1.0341, 1.0415, 1.0452, 1.046, 1.0446, 1.0417, 1.0379, 1.0334, 1.0288, 1.0241, 1.0197, 1.0157, 1.012, 1.0089, 1.0062, 1.0039, 1.0021, 1.0007, 0.9996, 0.9989, 0.9984, 0.9981, 0.9979, 1) 0.12s,
+        bottom 0.65s linear(0, 0.0222, 0.0797, 0.1606, 0.2553, 0.3562, 0.4572, 0.5542, 0.644, 0.7249, 0.7957, 0.8563, 0.9067, 0.9476, 0.9798, 1.0043, 1.022, 1.0341, 1.0415, 1.0452, 1.046, 1.0446, 1.0417, 1.0379, 1.0334, 1.0288, 1.0241, 1.0197, 1.0157, 1.012, 1.0089, 1.0062, 1.0039, 1.0021, 1.0007, 0.9996, 0.9989, 0.9984, 0.9981, 0.9979, 1) 0.12s,
+        border-radius 0.45s ease 0.14s,
+        box-shadow 0.4s ease;
 }
 
-.aplayer .aplayer-info .aplayer-music .aplayer-author,
-.aplayer .aplayer-list ol li .aplayer-list-author {
-    color: var(--text-secondary) !important;
+/* 扫描线 */
+.np-shell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 3px);
+    pointer-events: none;
 }
 
-.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap {
-    padding: 4px 0 !important;
+/* 顶部霓虹线：只在展开后出现 */
+.np-shell::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 24px;
+    right: 24px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--bright-cyan), var(--soft-pink), transparent);
+    opacity: 0;
+    transform: scaleX(0.2);
+    transition: opacity 0.15s ease, transform 0.2s ease;
+    pointer-events: none;
 }
 
-.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar {
-    background: rgba(255, 255, 255, 0.1) !important;
-    height: 4px !important;
-    border-radius: 2px !important;
+.np.is-expanded .np-shell::after {
+    opacity: 0.8;
+    transform: none;
+    transition: opacity 0.4s ease 0.45s, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.45s;
 }
 
-.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-loaded {
-    background: rgba(255, 255, 255, 0.2) !important;
+/* ---------- 内容依次进出 ---------- */
+.np-head,
+.np-lyric,
+.np-title,
+.np-artist,
+.np-bar,
+.np-controls {
+    opacity: 0;
+    visibility: hidden;
+    /* 退场：向左下角的唱片收拢 */
+    transform: translate(-14px, 10px) scale(0.94);
+    transform-origin: left bottom;
+    filter: blur(4px);
+    transition:
+        opacity 0.14s ease,
+        transform 0.2s cubic-bezier(0.5, 0, 0.75, 0),
+        filter 0.16s ease,
+        visibility 0s linear 0.2s;
 }
 
-.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-played {
-    background: linear-gradient(90deg, var(--bright-cyan), var(--soft-pink)) !important;
-    position: relative !important;
+.np.is-expanded :is(.np-head, .np-lyric, .np-title, .np-artist, .np-bar, .np-controls) {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    filter: none;
+    transition-property: opacity, transform, filter, visibility;
+    transition-duration: 0.3s, 0.6s, 0.35s, 0s;
+    transition-timing-function: ease, cubic-bezier(0.34, 1.45, 0.64, 1), ease, linear;
+    transition-timing-function: ease, linear(0, 0.0358, 0.1278, 0.2546, 0.3984, 0.5447, 0.683, 0.8059, 0.9092, 0.9912, 1.0518, 1.0927, 1.1164, 1.1258, 1.1241, 1.1145, 1.0996, 1.0819, 1.0633, 1.0454, 1.0292, 1.0153, 1.0041, 0.9956, 0.9897, 0.986, 0.9843, 0.9841, 0.9851, 0.9868, 0.9889, 0.9913, 0.9936, 0.9957, 0.9975, 0.9991, 1.0003, 1.0011, 1.0016, 1.0019, 1), ease, linear;
+    transition-delay: var(--np-enter-delay, 0.2s);
 }
 
-.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-played::before {
-    content: "" !important;
-    position: absolute !important;
-    inset: 0 !important;
-    background: linear-gradient(90deg, var(--bright-cyan), var(--soft-pink)) !important;
-    filter: blur(8px) !important;
-    opacity: 0.6 !important;
+.np-head { --np-enter-delay: 0.2s; }
+.np-lyric { --np-enter-delay: 0.26s; }
+.np-title { --np-enter-delay: 0.3s; }
+.np-artist { --np-enter-delay: 0.33s; }
+.np-bar { --np-enter-delay: 0.36s; }
+.np-controls { --np-enter-delay: 0.39s; }
+
+/* 首次渲染直接到位，不播放动画 */
+.np.is-instant,
+.np.is-instant * {
+    transition: none !important;
 }
 
-.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-played .aplayer-thumb {
-    background: var(--soft-pink) !important;
-    box-shadow: 0 0 12px var(--glow-pink) !important;
-    width: 12px !important;
-    height: 12px !important;
-    margin-top: -4px !important;
+/* ---------- 顶部状态栏 ---------- */
+.np-head {
+    grid-area: head;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
 }
 
-.aplayer .aplayer-icon {
-    color: var(--text-secondary) !important;
-    transition: all 0.3s ease !important;
+.np-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-muted);
+    font-family: var(--mono-font);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    white-space: nowrap;
 }
 
-.aplayer .aplayer-icon:hover {
-    color: var(--bright-cyan) !important;
+.np.is-playing .np-status {
+    color: var(--bright-cyan);
+    text-shadow: 0 0 8px var(--glow-cyan);
 }
 
-.aplayer .aplayer-icon-play,
-.aplayer .aplayer-icon-pause {
-    width: 32px !important;
-    height: 32px !important;
-    margin-right: 12px !important;
-    background: rgba(61, 217, 235, 0.15) !important;
-    border-radius: 50% !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+.np-index {
+    margin-right: auto;
+    color: rgba(255, 255, 255, 0.28);
+    font-family: var(--mono-font);
+    font-size: 10px;
+    letter-spacing: 0.08em;
 }
 
-.aplayer .aplayer-icon-play:hover,
-.aplayer .aplayer-icon-pause:hover {
-    background: rgba(61, 217, 235, 0.25) !important;
-    box-shadow: 0 4px 16px var(--glow-cyan) !important;
+.np-head-actions {
+    display: flex;
+    gap: 2px;
+    margin-right: -6px;
 }
 
-.aplayer .aplayer-lrc {
-    text-align: center !important;
-    margin: 8px 0 !important;
+/* 均衡器跳动条（音频跨域无法真实分析，用动画模拟） */
+.np-eq {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 12px;
 }
 
-.aplayer .aplayer-lrc p {
-    color: var(--text-secondary) !important;
-    font-size: 13px !important;
-    line-height: 1.6 !important;
-    transition: all 0.3s ease !important;
+.np-eq i {
+    width: 2px;
+    height: 100%;
+    border-radius: 1px;
+    background: linear-gradient(180deg, var(--soft-pink), var(--bright-cyan));
+    transform: scaleY(0.25);
+    transform-origin: bottom;
+    animation: np-eq 0.9s ease-in-out infinite alternate;
+    animation-play-state: paused;
 }
 
-.aplayer .aplayer-lrc p.aplayer-lrc-current {
-    color: var(--bright-cyan) !important;
-    font-size: 14px !important;
-    font-weight: 600 !important;
-    text-shadow: 0 0 12px var(--glow-cyan) !important;
+.np-eq i:nth-child(2) { animation-duration: 0.6s; animation-delay: -0.2s; }
+.np-eq i:nth-child(3) { animation-duration: 0.75s; animation-delay: -0.5s; }
+.np-eq i:nth-child(4) { animation-duration: 0.5s; animation-delay: -0.1s; }
+
+.np.is-playing .np-eq i {
+    animation-play-state: running;
 }
 
-.aplayer .aplayer-miniswitcher {
-    background: rgba(45, 27, 78, 0.9) !important;
-    border-radius: 12px !important;
-    border: 1px solid var(--glass-border) !important;
+@keyframes np-eq {
+    0% { transform: scaleY(0.2); }
+    50% { transform: scaleY(1); }
+    100% { transform: scaleY(0.45); }
 }
 
-.aplayer .aplayer-miniswitcher:hover {
-    background: rgba(61, 217, 235, 0.2) !important;
+/* ---------- 歌词：终端输出风格 ---------- */
+.np-lyric {
+    grid-area: lyric;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    min-height: 34px;
+    padding: 7px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    background: rgba(8, 4, 16, 0.4);
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.np-lyric::before {
+    content: ">";
+    flex: none;
+    color: var(--soft-pink);
+    font-family: var(--mono-font);
+    font-weight: 700;
+}
+
+.np-lyric::after {
+    content: "";
+    flex: none;
+    width: 7px;
+    height: 14px;
+    margin-left: -4px;
+    background: var(--bright-cyan);
+    box-shadow: 0 0 8px var(--glow-cyan);
+    animation: np-cursor 1.1s steps(1) infinite;
+}
+
+.np-lyric-text {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: rgba(245, 243, 255, 0.92);
+}
+
+.np-lyric-text.is-entering {
+    animation: np-lyric-in 0.4s ease-out;
+}
+
+@keyframes np-cursor {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+@keyframes np-lyric-in {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+        filter: blur(3px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+        filter: none;
+    }
+}
+
+/* ---------- 黑胶唱片 ---------- */
+.np-disc {
+    grid-area: disc;
+    align-self: end;
+    position: relative;
+    width: var(--np-disc);
+    height: var(--np-disc);
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    cursor: pointer;
+    transition: transform 0.25s ease;
+}
+
+.np:not(.is-expanded) .np-disc:hover {
+    transform: scale(1.05);
+}
+
+.np-disc:focus-visible {
+    outline: 2px solid var(--bright-cyan);
+    outline-offset: 3px;
+}
+
+.np-ring {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+    overflow: visible;
+}
+
+.np-ring circle {
+    fill: none;
+    stroke-width: 2.6;
+}
+
+.np-ring-track {
+    stroke: rgba(255, 255, 255, 0.08);
+}
+
+.np-ring-progress {
+    stroke: url(#np-ring-grad);
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 3px rgba(61, 217, 235, 0.8));
+    transition: stroke-dashoffset 0.3s linear;
+}
+
+.np-vinyl {
+    position: absolute;
+    inset: 6px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle, transparent 0 30%, rgba(232, 74, 158, 0.25) 30.5% 31.5%, transparent 32%),
+        repeating-radial-gradient(circle, #1a0d26 0 1px, #0b0512 1.5px 3px);
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+        0 6px 18px rgba(0, 0, 0, 0.6);
+    animation: np-spin 9s linear infinite;
+    animation-play-state: paused;
+}
+
+.np.is-playing .np-vinyl {
+    animation-play-state: running;
+}
+
+.np-cover {
+    width: 56%;
+    height: 56%;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 0 2px #0b0512;
+}
+
+/* 中心轴孔 */
+.np-vinyl::after {
+    content: "";
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #0b0512;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25);
+}
+
+/* 固定不转的高光，让旋转更有质感 */
+.np-disc::after {
+    content: "";
+    position: absolute;
+    inset: 6px;
+    border-radius: 50%;
+    background: conic-gradient(from 20deg, transparent 0 8%, rgba(255, 255, 255, 0.1) 12%, transparent 18% 55%, rgba(255, 255, 255, 0.07) 60%, transparent 66%);
+    pointer-events: none;
+}
+
+.np-disc-overlay {
+    position: absolute;
+    inset: 6px;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(10, 5, 18, 0.55);
+    color: #fff;
+    font-size: 18px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.np.is-expanded .np-disc:hover .np-disc-overlay,
+.np.is-expanded .np-disc:focus-visible .np-disc-overlay {
+    opacity: 1;
+}
+
+@keyframes np-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* 收起时唱片背后的呼吸光晕：落地后才亮起 */
+.np-halo,
+.np-ripple {
+    position: absolute;
+    left: calc(var(--np-center) - var(--np-disc) / 2 - 5px);
+    bottom: calc(var(--np-center) - var(--np-disc) / 2 - 5px);
+    width: calc(var(--np-disc) + 10px);
+    height: calc(var(--np-disc) + 10px);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.np-halo {
+    box-shadow: 0 0 22px rgba(232, 74, 158, 0.45), 0 0 44px rgba(61, 217, 235, 0.25);
+    opacity: 0.55;
+    transition: opacity 0.4s ease 0.6s;
+}
+
+.np.is-playing .np-halo {
+    animation: np-halo 2.4s ease-in-out infinite;
+}
+
+.np.is-expanded .np-halo {
+    opacity: 0;
+    animation: none;
+    transition: opacity 0.15s ease;
+}
+
+@keyframes np-halo {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.08); }
+}
+
+/* 落地 / 起跳时扩散的霓虹涟漪 */
+.np-ripple {
+    z-index: 2;
+    border: 2px solid var(--bright-cyan);
+    box-shadow: 0 0 14px var(--glow-cyan), inset 0 0 10px rgba(232, 74, 158, 0.45);
+    opacity: 0;
+}
+
+/* ---------- 编排动画 ---------- */
+.np.is-landing .np-shell {
+    animation: np-jelly 0.6s cubic-bezier(0.25, 0.8, 0.35, 1);
+}
+
+.np.is-landing .np-disc {
+    animation: np-jelly 0.6s cubic-bezier(0.25, 0.8, 0.35, 1) 0.04s;
+}
+
+.np.is-landing .np-ripple {
+    animation: np-ripple 0.75s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.np.is-expanding .np-disc {
+    animation: np-press 0.5s cubic-bezier(0.3, 0.7, 0.4, 1);
+}
+
+.np.is-expanding .np-ripple {
+    animation: np-ripple 0.6s cubic-bezier(0.2, 0.7, 0.3, 1) 0.05s;
+}
+
+/* 果冻回弹：先横向压扁，再纵向拉长，逐渐归位 */
+@keyframes np-jelly {
+    0% { transform: scale(1, 1); }
+    22% { transform: scale(1.12, 0.88); }
+    45% { transform: scale(0.93, 1.07); }
+    65% { transform: scale(1.04, 0.96); }
+    82% { transform: scale(0.99, 1.01); }
+    100% { transform: scale(1, 1); }
+}
+
+@keyframes np-press {
+    0% { transform: scale(1); }
+    30% { transform: scale(0.88); }
+    65% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes np-ripple {
+    0% { opacity: 0.95; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.9); }
+}
+
+/* ---------- 曲目信息 ---------- */
+.np-info {
+    grid-area: info;
+    align-self: end;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+
+.np-title {
+    overflow: hidden;
+    font-size: 15px;
+    font-weight: 650;
+    line-height: 1.35;
+    white-space: nowrap;
+}
+
+.np-title.has-overflow {
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 10px, #000 calc(100% - 18px), transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 10px, #000 calc(100% - 18px), transparent);
+}
+
+.np-title-text {
+    display: inline-block;
+}
+
+.np-title-text.is-scrolling {
+    padding-left: 10px;
+    animation: np-marquee var(--np-marquee-duration, 8s) ease-in-out infinite alternate;
+}
+
+.np-title.is-glitching {
+    animation: np-glitch 0.5s steps(2, end) 1;
+}
+
+@keyframes np-marquee {
+    0%, 15% { transform: translateX(0); }
+    85%, 100% { transform: translateX(var(--np-shift, 0)); }
+}
+
+@keyframes np-glitch {
+    0% {
+        transform: translateX(2px);
+        text-shadow: 2px 0 var(--soft-pink), -2px 0 var(--bright-cyan);
+        clip-path: inset(0 0 55% 0);
+    }
+    25% {
+        transform: translateX(-2px);
+        text-shadow: -2px 0 var(--soft-pink), 2px 0 var(--bright-cyan);
+        clip-path: inset(45% 0 0 0);
+    }
+    50% {
+        transform: translateX(1px);
+        text-shadow: 1px 0 var(--soft-pink), -1px 0 var(--bright-cyan);
+        clip-path: inset(20% 0 30% 0);
+    }
+    100% {
+        transform: none;
+        text-shadow: none;
+        clip-path: none;
+    }
+}
+
+.np-artist {
+    overflow: hidden;
+    color: var(--text-secondary);
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ---------- 进度条 ---------- */
+.np-bar {
+    position: relative;
+    height: 14px;
+    margin-top: 2px;
+    cursor: pointer;
+    touch-action: none;
+}
+
+.np-bar::before,
+.np-buffer,
+.np-played {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    height: 3px;
+    border-radius: 3px;
+    transform: translateY(-50%);
+    transition: height 0.2s ease;
+}
+
+.np-bar::before {
+    content: "";
+    right: 0;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.np-buffer {
+    width: 0;
+    background: rgba(255, 255, 255, 0.14);
+}
+
+.np-played {
+    width: 0;
+    background: linear-gradient(90deg, var(--bright-cyan), var(--soft-pink));
+    box-shadow: 0 0 10px rgba(61, 217, 235, 0.45);
+}
+
+.np-played::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: -6px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(232, 74, 158, 0.35), 0 0 12px var(--soft-pink);
+    transform: translateY(-50%) scale(0);
+    transition: transform 0.2s ease;
+}
+
+.np-bar:hover::before,
+.np-bar:hover .np-buffer,
+.np-bar:hover .np-played,
+.np-bar.is-seeking::before,
+.np-bar.is-seeking .np-buffer,
+.np-bar.is-seeking .np-played {
+    height: 5px;
+}
+
+.np-bar:hover .np-played::after,
+.np-bar.is-seeking .np-played::after,
+.np-bar:focus-visible .np-played::after {
+    transform: translateY(-50%) scale(1);
+}
+
+.np-bar:focus-visible {
+    outline: none;
+}
+
+/* ---------- 控制区 ---------- */
+.np-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.np-time {
+    color: var(--bright-cyan);
+    font-family: "DS-Digital", var(--mono-font);
+    font-size: 17px;
+    letter-spacing: 0.04em;
+    text-shadow: 0 0 8px var(--glow-cyan);
+    white-space: nowrap;
+}
+
+.np-total {
+    color: var(--text-muted);
+    text-shadow: none;
+}
+
+.np-buttons {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.np-btn {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 13px;
+    cursor: pointer;
+    transition: color 0.2s ease, background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.np-btn:hover {
+    background: rgba(61, 217, 235, 0.1);
+    color: var(--bright-cyan);
+}
+
+.np-btn:active {
+    transform: scale(0.9);
+}
+
+.np-btn:focus-visible {
+    outline: 2px solid var(--bright-cyan);
+    outline-offset: 1px;
+}
+
+.np-btn.is-on {
+    color: var(--soft-pink);
+}
+
+.np-play {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, var(--bright-cyan), var(--soft-pink));
+    box-shadow: 0 6px 18px rgba(232, 74, 158, 0.35);
+    color: var(--midnight);
+    font-size: 14px;
+}
+
+.np-play:hover {
+    background: linear-gradient(135deg, var(--bright-cyan), var(--soft-pink));
+    box-shadow: 0 0 22px rgba(61, 217, 235, 0.55);
+    color: var(--midnight);
+}
+
+.np-play .fa-play {
+    margin-left: 2px;
+}
+
+.np:not(.is-ready) .np-buttons,
+.np:not(.is-ready) .np-bar {
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+.np.is-offline .np-vinyl {
+    filter: grayscale(1) brightness(0.7);
+}
+
+/* ---------- 收起时的歌名标签 ---------- */
+.np-ticker {
+    position: absolute;
+    left: calc(var(--np-center) + var(--np-disc) / 2 + 14px);
+    bottom: calc(var(--np-center) - 15px);
+    max-width: min(240px, calc(100vw - 140px));
+    padding: 6px 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    background: rgba(24, 13, 42, 0.92);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    color: var(--text-secondary);
+    font-family: var(--mono-font);
+    font-size: 12px;
+    line-height: 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateX(-8px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    pointer-events: none;
+}
+
+.np-ticker:empty {
+    display: none;
+}
+
+.np:not(.is-expanded):has(.np-disc:hover) .np-ticker,
+.np.show-ticker:not(.is-expanded) .np-ticker {
+    opacity: 1;
+    transform: none;
+}
+
+/* ---------- 播放列表抽屉 ---------- */
+.np-drawer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(100% + 10px);
+    display: flex;
+    flex-direction: column;
+    max-height: min(340px, 55vh);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 18px;
+    background: var(--np-surface);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(14px) scale(0.98);
+    transform-origin: bottom left;
+    transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 0.3s;
+}
+
+.np.is-list-open .np-drawer {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s;
+}
+
+.np-drawer-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px 8px;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.np-search {
+    flex: 1;
+    min-width: 0;
+    padding: 6px 10px;
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    outline: none;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-primary);
+    font-family: var(--mono-font);
+    font-size: 12px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.np-search:focus {
+    border-color: var(--bright-cyan);
+    box-shadow: 0 0 0 3px rgba(61, 217, 235, 0.12);
+}
+
+.np-search::placeholder {
+    color: var(--text-muted);
+}
+
+.np-count {
+    flex: none;
+    font-family: var(--mono-font);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+}
+
+.np-list {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    padding: 2px 6px 8px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    list-style: none;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(61, 217, 235, 0.3) transparent;
+}
+
+.np-item {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    padding: 7px 8px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.np-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.np-item:focus-visible {
+    outline: 1px solid var(--bright-cyan);
+    outline-offset: -1px;
+}
+
+.np-item-no {
+    color: var(--text-muted);
+    font-family: var(--mono-font);
+    font-size: 11px;
+    text-align: right;
+}
+
+.np-item-meta {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.np-item-name,
+.np-item-artist {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.np-item-name {
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.np-item-artist {
+    color: var(--text-muted);
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.np-item.is-active {
+    background: linear-gradient(90deg, rgba(61, 217, 235, 0.16), rgba(232, 74, 158, 0.06));
+    box-shadow: inset 2px 0 0 var(--soft-pink);
+}
+
+.np-item.is-active .np-item-no {
+    color: var(--soft-pink);
+}
+
+.np-item.is-active .np-item-name {
+    color: var(--bright-cyan);
+}
+
+.np-item.is-broken {
+    opacity: 0.4;
+}
+
+.np-item.is-broken .np-item-name {
+    text-decoration: line-through;
+}
+
+@media (max-width: 680px) {
+    .np {
+        --np-gap: 12px;
+        --np-disc: 68px;
+        --np-pad: 14px;
+    }
+}
+
+@media (max-width: 340px) {
+    .np-total {
+        display: none;
+    }
 }
 
 @keyframes page-enter {

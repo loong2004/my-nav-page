@@ -11,21 +11,18 @@
     <meta property="og:url" content="https://nav.885123.xyz/">
     <meta property="og:title" content="奶蛙de个人主页">
     <meta property="og:description" content="Search less. Go further.">
-    <meta property="og:image" content="./avatar.jpg">
+    <meta property="og:image" content="https://nav.885123.xyz/avatar.jpg">
 
     <title>奶蛙de个人主页</title>
 
-    <link rel="preconnect" href="https://api.paugram.com">
-    <link rel="preconnect" href="https://npm.elemecdn.com">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="preconnect" href="https://ghchart.rshah.org">
-    <link rel="preconnect" href="https://images.unsplash.com">
+    <link rel="preconnect" href="https://api.injahow.cn">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/inter@5/index.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/noto-sans-sc@5/index.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/jetbrains-mono@5/index.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css">
-    <link rel="stylesheet" href="https://npm.elemecdn.com/aplayer/dist/APlayer.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="./avatar.jpg">
 
@@ -209,21 +206,13 @@
         </footer>
     </main>
 
-    <meting-js
-        server="netease"
-        type="playlist"
-        id="24381616"
-        fixed="true"
-        mini="true"
-        order="random"
-        loop="all"
-        preload="auto"
-        list-folded="true"
-        lrc-type="1">
-    </meting-js>
+    <!-- 音乐播放器：修改 data-id 即可换歌单，data-server 支持 netease / tencent 等 Meting 支持的平台 -->
+    <aside id="neon-player" class="np" aria-label="音乐播放器"
+        data-api="https://api.injahow.cn/meting/"
+        data-server="netease"
+        data-type="playlist"
+        data-id="24381616"></aside>
 
-    <script src="https://npm.elemecdn.com/aplayer/dist/APlayer.min.js"></script>
-    <script src="https://npm.elemecdn.com/meting@2/dist/Meting.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
