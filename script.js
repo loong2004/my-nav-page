@@ -4,145 +4,12 @@ function onMediaChange(mql, handler) {
     else if (mql.addListener) mql.addListener(handler);
 }
 
-// 背景粒子系统
-function initParticles() {
-    const canvas = document.getElementById('particles-canvas');
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const LINK_DISTANCE = 150;
-    const LINK_DISTANCE_SQ = LINK_DISTANCE * LINK_DISTANCE;
-    const particles = [];
-    let animationId = null;
-
-    // 粒子类
-    class Particle {
-        constructor() {
-            this.reset();
-            this.y = Math.random() * canvas.height;
-        }
-
-        reset() {
-            this.x = Math.random() * canvas.width;
-            this.y = -10;
-            this.vx = (Math.random() - 0.5) * 0.5;
-            this.vy = Math.random() * 0.3 + 0.2;
-            this.size = Math.random() * 2 + 1;
-            this.opacity = Math.random() * 0.5 + 0.2;
-            // 随机颜色：青色或粉色
-            this.color = Math.random() > 0.5 ? '61, 217, 235' : '232, 74, 158';
-        }
-
-        update() {
-            this.x += this.vx;
-            this.y += this.vy;
-
-            // 边界检查
-            if (this.y > canvas.height + 10) {
-                this.reset();
-            }
-            if (this.x < -10 || this.x > canvas.width + 10) {
-                this.x = Math.random() * canvas.width;
-            }
-        }
-
-        draw() {
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(${this.color}, ${this.opacity})`;
-            ctx.fill();
-
-            // 添加发光效果
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = `rgba(${this.color}, ${this.opacity * 0.8})`;
-            ctx.fill();
-            ctx.shadowBlur = 0;
-        }
-    }
-
-    // 粒子数量随画布面积变化（窗口缩放后同步增减）
-    function syncParticleCount() {
-        const target = Math.min(Math.floor((canvas.width * canvas.height) / 15000), 100);
-        while (particles.length < target) particles.push(new Particle());
-        if (particles.length > target) particles.length = target;
-    }
-
-    // 连接线（用距离平方比较，省掉开方）
-    function drawConnections() {
-        ctx.lineWidth = 1;
-        for (let i = 0; i < particles.length; i++) {
-            for (let j = i + 1; j < particles.length; j++) {
-                const dx = particles[i].x - particles[j].x;
-                const dy = particles[i].y - particles[j].y;
-                const distSq = dx * dx + dy * dy;
-
-                if (distSq < LINK_DISTANCE_SQ) {
-                    const opacity = (1 - Math.sqrt(distSq) / LINK_DISTANCE) * 0.15;
-                    ctx.beginPath();
-                    ctx.moveTo(particles[i].x, particles[i].y);
-                    ctx.lineTo(particles[j].x, particles[j].y);
-                    ctx.strokeStyle = `rgba(196, 181, 232, ${opacity})`;
-                    ctx.stroke();
-                }
-            }
-        }
-    }
-
-    function drawFrame(shouldUpdate) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particles.forEach(particle => {
-            if (shouldUpdate) particle.update();
-            particle.draw();
-        });
-        drawConnections();
-    }
-
-    function animate() {
-        drawFrame(true);
-        animationId = requestAnimationFrame(animate);
-    }
-
-    function stop() {
-        if (animationId !== null) {
-            cancelAnimationFrame(animationId);
-            animationId = null;
-        }
-    }
-
-    // 页面隐藏时停止；系统开启「减弱动态效果」时只画静态的一帧
-    function syncAnimationState() {
-        if (document.hidden || reducedMotion.matches) {
-            stop();
-            if (reducedMotion.matches) drawFrame(false);
-        } else if (animationId === null) {
-            animationId = requestAnimationFrame(animate);
-        }
-    }
-
-    function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        syncParticleCount();
-        // 修改画布尺寸会清空画面，静止状态下需要补画
-        if (animationId === null) drawFrame(false);
-    }
-
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-    document.addEventListener('visibilitychange', syncAnimationState);
-    onMediaChange(reducedMotion, syncAnimationState);
-    syncAnimationState();
-}
-
-// 2. 搜索配置 (Tab 键循环切换)
+// 2. 搜索配置（↑ ↓ 循环切换）
 const searchEngines = {
-    google: { url: "https://www.google.com/search?q=", icon: "fab fa-google", placeholder: "Search with Google..." },
-    baidu: { url: "https://www.baidu.com/s?wd=", icon: "fas fa-paw", placeholder: "百度一下，你就知道" },
-    bing: { url: "https://www.bing.com/search?q=", icon: "fab fa-microsoft", placeholder: "Search with Bing..." },
-    duckduckgo: { url: "https://duckduckgo.com/?q=", icon: "fas fa-shield-alt", placeholder: "Privacy Search..." }
+    google: { label: "Google", url: "https://www.google.com/search?q=", icon: "fab fa-google", placeholder: "用 Google 搜索..." },
+    baidu: { label: "Baidu", url: "https://www.baidu.com/s?wd=", icon: "fas fa-paw", placeholder: "百度一下..." },
+    bing: { label: "Bing", url: "https://www.bing.com/search?q=", icon: "fab fa-microsoft", placeholder: "用 Bing 搜索..." },
+    duckduckgo: { label: "DuckDuckGo", url: "https://duckduckgo.com/?q=", icon: "fas fa-shield-alt", placeholder: "不被追踪地搜索..." }
 };
 
 const commandRoutes = {
@@ -232,6 +99,8 @@ function selectEngine(engineKey) {
     // 更新 UI
     const engine = searchEngines[engineKey];
     document.getElementById('current-engine-icon').className = engine.icon;
+    const engineName = document.getElementById('current-engine-name');
+    if (engineName) engineName.textContent = engine.label;
     if (searchInput) searchInput.placeholder = engine.placeholder;
 
     // 关闭菜单并聚焦
@@ -325,7 +194,51 @@ if (searchInput) {
     });
 }
 
-// 3. 实时时钟 + 问候
+// 3. 实时时钟 + 问候 + 今日读数
+const WEEKDAYS = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+let lastReadoutKey = '';
+
+// 分段仪表：已过去的格子点亮，当前所在的格子闪烁
+function paintMeter(el, count, progress) {
+    if (!el) return;
+    if (el.childElementCount !== count) {
+        el.replaceChildren(...Array.from({ length: count }, () => document.createElement('i')));
+    }
+    const current = Math.min(Math.floor(progress * count), count - 1);
+    Array.from(el.children).forEach((seg, i) => {
+        seg.className = i < current ? 'is-on' : (i === current ? 'is-now' : '');
+    });
+}
+
+function updateReadout(now) {
+    const dateEl = document.getElementById('readout-date');
+    if (!dateEl) return;
+    const key = `${now.toDateString()} ${now.getHours()}:${now.getMinutes()}`;
+    if (key === lastReadoutKey) return; // 每分钟刷新一次即可
+    lastReadoutKey = key;
+
+    const y = now.getFullYear();
+    const m = now.getMonth();
+    const d = now.getDate();
+    const pad = n => String(n).padStart(2, '0');
+    dateEl.textContent = `${y}.${pad(m + 1)}.${pad(d)}`;
+    dateEl.dateTime = `${y}-${pad(m + 1)}-${pad(d)}`;
+    document.getElementById('readout-week').textContent = WEEKDAYS[now.getDay()];
+
+    const dayProgress = (now.getHours() * 60 + now.getMinutes()) / 1440;
+    document.getElementById('day-pct').textContent = `${Math.floor(dayProgress * 100)}%`;
+    paintMeter(document.getElementById('day-meter'), 24, dayProgress);
+
+    const startOfYear = new Date(y, 0, 1);
+    const yearProgress = (now - startOfYear) / (new Date(y + 1, 0, 1) - startOfYear);
+    const dayOfYear = Math.round((new Date(y, m, d) - startOfYear) / 86400000) + 1;
+    const daysInMonth = new Date(y, m + 1, 0).getDate();
+    document.getElementById('year-day').textContent = String(dayOfYear);
+    document.getElementById('year-pct').textContent = `${Math.floor(yearProgress * 100)}%`;
+    // 12 格按月份点亮
+    paintMeter(document.getElementById('year-meter'), 12, (m + (d - 1) / daysInMonth) / 12);
+}
+
 function updateClock() {
     const now = new Date();
     document.getElementById('clock').textContent = now.toLocaleTimeString('zh-CN', { hour12: false });
@@ -340,13 +253,14 @@ function updateClock() {
     else if (hour < 23) greeting = "晚上好，享受属于你的时间";
     else greeting = "夜深了，晚安";
     document.getElementById('greeting').innerText = greeting;
+    updateReadout(now);
 }
 
 // 4. 一言 API
 function fetchHitokoto() {
     fetchJsonWithRetry('https://v1.hitokoto.cn/?c=a&c=b', {}, { timeout: 3500, retries: 1, retryDelay: 250 })
         .then(data => { document.getElementById('hitokoto_text').innerText = `${data.hitokoto} —— ${data.from}`; })
-        .catch(() => { document.getElementById('hitokoto_text').innerText = "QUOTE: ONLINE / READY"; });
+        .catch(() => { document.getElementById('hitokoto_text').innerText = "生活明朗，万物可爱。"; });
 }
 
 
@@ -411,17 +325,12 @@ function fetchWeather() {
             const weather = new AMap.Weather();
 
             geolocation.getCityInfo((status, result) => {
-                let targetAdcode = amapConfig.defaultCity;
-                if (status === 'complete' && result.adcode) {
-                    targetAdcode = result.adcode;
-                    console.log("定位成功:", result.city);
-                } else {
-                    console.warn("定位失败，使用默认城市");
-                }
+                // 定位失败时使用默认城市
+                const targetAdcode = status === 'complete' && result.adcode ? result.adcode : amapConfig.defaultCity;
 
                 weather.getLive(targetAdcode, (err, data) => {
                     if (!err && data.info === 'OK') {
-                        finalizeWeather(`WEATHER: ${data.city} / ${data.weather} / ${data.temperature}℃`);
+                        finalizeWeather(`${data.city} · ${data.weather} · ${data.temperature}℃`);
                     } else {
                         trySeniverse();
                     }
@@ -434,18 +343,17 @@ function fetchWeather() {
         if (weatherResolved || seniverseStarted) return; // 防止超时和失败回调各触发一次
         seniverseStarted = true;
         clearTimeout(amapTimer);
-        console.log("Switching to Seniverse Weather...");
         const url = `https://api.seniverse.com/v3/weather/now.json?key=${seniverseConfig.key}&location=${seniverseConfig.location}&language=zh-Hans&unit=c`;
         fetchJsonWithRetry(url, {}, { timeout: 4000, retries: 1, retryDelay: 300 })
             .then(data => {
                 if (data.results && data.results[0]) {
                     const res = data.results[0];
-                    finalizeWeather(`WEATHER: ${res.location.name} / ${res.now.text} / ${res.now.temperature}℃`);
+                    finalizeWeather(`${res.location.name} · ${res.now.text} · ${res.now.temperature}℃`);
                 } else {
-                    finalizeWeather("WEATHER: OFFLINE");
+                    finalizeWeather("天气暂不可用");
                 }
             })
-            .catch(() => { finalizeWeather("WEATHER: OFFLINE"); });
+            .catch(() => { finalizeWeather("天气暂不可用"); });
     }
 
     startWeatherSystem();
@@ -602,17 +510,13 @@ function startLatencyTest() {
             const id = getSiteId(site);
             return `
                 <div class="net-card">
-                    <div class="net-header">
-                        <span class="net-icon"><i class="${site.icon}"></i> ${site.name}</span>
-                        <span class="net-badge badge-${site.region === '国内' ? 'cn' : 'intl'}">${site.region}</span>
-                    </div>
-                    <div class="net-body">
-                        <span class="net-latency" id="latency-${id}">PING</span>
-                        <svg class="latency-chart" width="100%" height="40" id="chart-${id}">
-                            <path id="path-${id}" fill="none" stroke="rgba(61, 217, 235, 0.6)" stroke-width="2"></path>
-                            <circle id="cursor-${id}" r="3" fill="var(--bright-cyan)" opacity="0"></circle>
-                        </svg>
-                    </div>
+                    <span class="net-name"><i class="${site.icon}" aria-hidden="true"></i>${site.name}</span>
+                    <span class="net-badge">${site.region === '国内' ? 'CN' : 'INTL'}</span>
+                    <svg class="latency-chart" height="28" id="chart-${id}" aria-hidden="true">
+                        <path id="path-${id}" fill="none" stroke="var(--text-3)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"></path>
+                        <circle id="cursor-${id}" r="2.5" fill="var(--text)" opacity="0"></circle>
+                    </svg>
+                    <span class="net-latency" id="latency-${id}">—</span>
                 </div>
             `;
         }).join('');
@@ -660,7 +564,7 @@ function startLatencyTest() {
 
         // 绘制折线图
         const chartWidth = pathElem.parentElement.clientWidth || 200;
-        const chartHeight = 40;
+        const chartHeight = 28;
         const points = latencies.slice(-LATENCY_CONFIG.count);
 
         if (points.length < 2) return;
@@ -712,7 +616,7 @@ function startLatencyTest() {
         networkToggle.setAttribute('aria-expanded', String(!isCollapsed));
         const toggleText = networkToggle.querySelector('span');
         if (toggleText) {
-            toggleText.innerText = isCollapsed ? 'SHOW' : 'HIDE';
+            toggleText.innerText = isCollapsed ? '展开' : '收起';
         }
     }
 
@@ -734,7 +638,7 @@ function startLatencyTest() {
         generateLatencyCards();
 
         if (networkSummary) {
-            networkSummary.innerText = `NETWORK: ${LATENCY_SITES.length} NODES SAMPLING`;
+            networkSummary.innerText = `采样中 · ${LATENCY_SITES.length} 个节点`;
         }
 
         // 初始化每个站点的数据数组
@@ -757,7 +661,7 @@ function startLatencyTest() {
         }));
 
         if (networkSummary) {
-            networkSummary.innerText = `NETWORK: ${LATENCY_SITES.length} NODES MONITORING`;
+            networkSummary.innerText = `实时监测 · ${LATENCY_SITES.length} 个节点`;
         }
 
         // 持续刷新：上一轮全部完成后再排下一轮，避免慢网络下请求堆积
@@ -787,7 +691,7 @@ function startLatencyTest() {
     runLatencyTest().catch(err => {
         console.error('Latency test failed:', err);
         if (networkSummary) {
-            networkSummary.innerText = 'NETWORK: ERROR';
+            networkSummary.innerText = '检测失败';
         }
     });
 }
@@ -810,7 +714,6 @@ function initNeonPlayer() {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     root.innerHTML = `
-        <div class="np-halo" aria-hidden="true"></div>
         <div class="np-ripple" aria-hidden="true"></div>
         <section class="np-drawer" aria-label="播放列表">
             <div class="np-drawer-head">
@@ -837,12 +740,6 @@ function initNeonPlayer() {
             <p class="np-lyric"><span class="np-lyric-text">正在接入音乐频道...</span></p>
             <button class="np-disc" type="button" aria-label="展开音乐播放器">
                 <svg class="np-ring" viewBox="0 0 72 72" aria-hidden="true">
-                    <defs>
-                        <linearGradient id="np-ring-grad" x1="0" y1="0" x2="1" y2="1">
-                            <stop offset="0" stop-color="#3dd9eb"></stop>
-                            <stop offset="1" stop-color="#e84a9e"></stop>
-                        </linearGradient>
-                    </defs>
                     <circle class="np-ring-track" cx="36" cy="36" r="34"></circle>
                     <circle class="np-ring-progress" cx="36" cy="36" r="34"></circle>
                 </svg>
@@ -871,7 +768,6 @@ function initNeonPlayer() {
 
     const $ = selector => root.querySelector(selector);
     const els = {
-        panel: $('.np-panel'),
         status: $('.np-status'),
         index: $('.np-index'),
         shuffle: $('.np-shuffle'),
@@ -1222,7 +1118,8 @@ function initNeonPlayer() {
         els.buffer.style.width = '0%';
         renderProgress(0);
 
-        replayAnimation(els.title, 'is-glitching');
+        replayAnimation(els.title, 'is-switching');
+        replayAnimation(els.artist, 'is-switching');
         updateMarquee();
         markActive();
         loadLyrics(track);
@@ -1485,6 +1382,72 @@ function initNeonPlayer() {
         });
 }
 
+// 10. GitHub 提交点阵（数据来自 github-contributions-api.jogruber.de，支持跨域）
+function initContributions() {
+    const box = document.getElementById('contrib');
+    const grid = document.getElementById('contrib-grid');
+    const total = document.getElementById('contrib-total');
+    if (!box || !grid || !total || !box.dataset.user) return;
+
+    const user = box.dataset.user;
+    const CACHE_KEY = `contrib_cache_${user}`;
+    const CACHE_TIME = 6 * 3600000; // 6 小时
+    let rendered = false;
+
+    function render(data) {
+        const days = Array.isArray(data && data.contributions) ? data.contributions : [];
+        if (!days.length) throw new Error('EMPTY');
+
+        const fragment = document.createDocumentFragment();
+        // 第一列从周日开始，前面补空位
+        const firstWeekday = new Date(`${days[0].date}T00:00:00`).getDay();
+        for (let i = 0; i < firstWeekday; i++) {
+            const pad = document.createElement('i');
+            pad.className = 'is-pad';
+            fragment.appendChild(pad);
+        }
+        days.forEach((day, index) => {
+            const dot = document.createElement('i');
+            dot.style.setProperty('--col', String(Math.floor((index + firstWeekday) / 7)));
+            if (day.level > 0) dot.dataset.l = String(Math.min(day.level, 4));
+            dot.title = `${day.date} · ${day.count} 次提交`;
+            fragment.appendChild(dot);
+        });
+        grid.replaceChildren(fragment);
+
+        const sum = data.total && typeof data.total === 'object'
+            ? Object.values(data.total).reduce((acc, n) => acc + (Number(n) || 0), 0)
+            : days.reduce((acc, day) => acc + (day.count || 0), 0);
+        total.innerHTML = `过去一年 <strong>${sum}</strong> 次提交`;
+
+        // 小屏横向滚动时，默认显示最近的几周
+        const scroller = grid.parentElement;
+        scroller.scrollLeft = scroller.scrollWidth;
+        rendered = true;
+    }
+
+    try {
+        const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+        if (cached && cached.data) {
+            render(cached.data);
+            if (Date.now() - cached.time < CACHE_TIME) return;
+        }
+    } catch {
+        localStorage.removeItem(CACHE_KEY);
+    }
+
+    fetchJsonWithRetry(`https://github-contributions-api.jogruber.de/v4/${encodeURIComponent(user)}?y=last`, {}, { timeout: 8000, retries: 1, retryDelay: 500 })
+        .then(data => {
+            render(data);
+            try { localStorage.setItem(CACHE_KEY, JSON.stringify({ data, time: Date.now() })); } catch { /* 存储已满时忽略 */ }
+        })
+        .catch(() => {
+            if (rendered) return;
+            box.classList.add('is-failed');
+            total.innerHTML = `提交记录暂时读取失败，<a href="https://github.com/${encodeURIComponent(user)}" target="_blank" rel="noopener noreferrer">去 GitHub 查看</a>`;
+        });
+}
+
 // 8. 极速预加载控制 (System Initialization - Turbo Mode)
 // 修正逻辑：DOM 准备好立刻显示，不再等待所有资源加载完毕
 document.addEventListener('DOMContentLoaded', function() {
@@ -1509,13 +1472,13 @@ window.addEventListener('load', function() {
 });
 
 // 初始化
-initParticles(); // 启动粒子系统
 selectEngine(currentEngine);
 setInterval(updateClock, 1000);
 updateClock();
 fetchHitokoto();
 fetchWeather();
 fetchGithubStars();
+initContributions();
 initNeonPlayer();
 
 // 启动延迟测试 (使用 DOM ready 检测确保在正确时机运行)
@@ -1526,7 +1489,7 @@ if (document.readyState === 'loading') {
 }
 
 console.log(
-    "%c ⚡ LOONG'S TERMINAL %c SYSTEM READY ",
-    "background: linear-gradient(135deg, #3dd9eb, #e84a9e); color: #1a0f2e; font-weight: bold; font-size: 14px; padding: 8px 12px; border-radius: 4px 0 0 4px;",
-    "background: #1a0f2e; color: #3dd9eb; font-weight: bold; font-size: 14px; border: 2px solid #3dd9eb; padding: 6px 12px; border-radius: 0 4px 4px 0;"
+    "%c LOONG %c 个人终端 · 手工搭建 ",
+    "background: #ff5b1f; color: #1c0c05; font-weight: 600; padding: 4px 8px; border-radius: 3px 0 0 3px;",
+    "background: #1b1b18; color: #ece8dc; padding: 4px 8px; border-radius: 0 3px 3px 0;"
 );
