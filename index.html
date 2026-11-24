@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Loong 的个人工作台：搜索、导航与网络状态一站直达。">
-    <meta name="theme-color" content="#131311">
-    <meta name="color-scheme" content="dark">
+    <meta name="description" content="Loong 的个人工作台：搜索、导航、黑胶音频与网络状态一站直达。">
+    <meta name="theme-color" content="#0a0a0d">
+    <meta name="color-scheme" content="dark light">
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://nav.885123.xyz/">
@@ -15,25 +15,42 @@
 
     <title>奶蛙de个人主页</title>
 
+    <script>
+        (function () {
+            try {
+                var t = localStorage.getItem('atelier_theme');
+                var theme = t === 'light' ? 'light' : 'dark';
+                var root = document.documentElement;
+                root.dataset.theme = theme;
+                var meta = document.querySelector('meta[name="theme-color"]');
+                if (meta) meta.setAttribute('content', theme === 'light' ? '#f2efe9' : '#0a0a0d');
+            } catch (e) {}
+        })();
+    </script>
+
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="preconnect" href="https://api.injahow.cn">
     <link rel="preconnect" href="https://github-contributions-api.jogruber.de">
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/ibm-plex-sans@5/400.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/ibm-plex-sans@5/500.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/ibm-plex-sans@5/600.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/ibm-plex-mono@5/400.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/ibm-plex-mono@5/500.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/plus-jakarta-sans@5/index.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/instrument-serif@5/400.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/instrument-serif@5/400-italic.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/jetbrains-mono@5/index.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/noto-sans-sc@5/index.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="./avatar.jpg">
 
     <style>
-        body {
+        html[data-theme="dark"] body {
             margin: 0;
-            color: #ece8dc;
-            background: #131311;
+            color: #f3f0e8;
+            background: #0a0a0d;
+        }
+
+        html[data-theme="light"] body {
+            margin: 0;
+            color: #181715;
+            background: #f2efe9;
         }
 
         #preloader {
@@ -42,8 +59,12 @@
             z-index: 9999;
             display: grid;
             place-items: center;
-            background: #131311;
-            transition: opacity 0.4s ease, visibility 0.4s ease;
+            background: var(--bg, #0a0a0d);
+            transition: opacity 0.35s ease, visibility 0.35s ease;
+        }
+
+        html[data-theme="light"] #preloader {
+            background: #f2efe9;
         }
 
         #preloader.hidden {
@@ -54,6 +75,51 @@
     </style>
 </head>
 <body>
+    <svg class="svg-sprite" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+        <defs>
+            <symbol id="ic-pin" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></symbol>
+            <symbol id="ic-refresh" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></g></symbol>
+            <symbol id="ic-sun" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></g></symbol>
+            <symbol id="ic-moon" viewBox="0 0 24 24"><path fill="currentColor" d="M20.35 15.36A9 9 0 0 1 8.64 3.65a.75.75 0 0 0-.96-.96A9.5 9.5 0 1 0 21.31 16.32a.75.75 0 0 0-.96-.96z"/></symbol>
+            <symbol id="ic-github" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.58 2 12.22c0 4.52 2.87 8.35 6.84 9.7.5.1.68-.22.68-.49v-1.73c-2.78.62-3.37-1.36-3.37-1.36-.45-1.18-1.11-1.49-1.11-1.49-.91-.63.07-.62.07-.62 1 .07 1.53 1.05 1.53 1.05.9 1.57 2.36 1.12 2.93.86.09-.66.35-1.12.64-1.38-2.22-.26-4.56-1.13-4.56-5.04 0-1.11.39-2.02 1.03-2.73-.1-.26-.45-1.3.1-2.7 0 0 .84-.28 2.75 1.04A9.4 9.4 0 0 1 12 6.84c.85 0 1.7.12 2.5.34 1.91-1.32 2.75-1.04 2.75-1.04.55 1.4.2 2.44.1 2.7.64.71 1.03 1.62 1.03 2.73 0 3.92-2.34 4.78-4.58 5.03.36.32.68.94.68 1.9v2.82c0 .27.18.6.69.49A10.22 10.22 0 0 0 22 12.22C22 6.58 17.52 2 12 2z"/></symbol>
+            <symbol id="ic-star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.5l2.9 6.08 6.6.91-4.8 4.62 1.18 6.56L12 17.5l-5.88 3.17 1.18-6.56-4.8-4.62 6.6-.91z"/></symbol>
+            <symbol id="ic-telegram" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.66-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.24.37-.49 1.02-.75 3.98-1.73 6.64-2.88 7.97-3.44 3.8-1.58 4.59-1.85 5.1-1.86.11 0 .37.03.54.17.14.12.18.28.2.45-.01.07.01.24 0 .38z"/></symbol>
+            <symbol id="ic-mail" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.6 6.2 12 12.6l8.4-6.4"/></g></symbol>
+            <symbol id="ic-copy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></g></symbol>
+            <symbol id="ic-check" viewBox="0 0 24 24"><polyline fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" points="20 6 9 17 4 12"/></symbol>
+            <symbol id="ic-bing" viewBox="0 0 24 24"><path fill="currentColor" d="M3 3h8.4v8.4H3V3zm9.6 0H21v8.4h-8.4V3zM3 12.6h8.4V21H3v-8.4zm9.6 0H21V21h-8.4v-8.4z"/></symbol>
+            <symbol id="ic-google" viewBox="0 0 24 24"><path fill="currentColor" d="M21.35 11.1h-9.17v2.73h5.27c-.23 1.46-1.57 4.28-5.27 4.28-3.17 0-5.76-2.63-5.76-5.86s2.59-5.86 5.76-5.86c1.81 0 3.01.77 3.7 1.44l2.52-2.43C16.78 3.9 14.68 3 12.18 3 7.1 3 3 7.14 3 12.25s4.1 9.25 9.18 9.25c5.3 0 8.82-3.73 8.82-8.98 0-.6-.07-1.06-.15-1.42z"/></symbol>
+            <symbol id="ic-baidu" viewBox="0 0 24 24"><path fill="currentColor" d="M6.2 11.2a2.1 2.4 0 1 0 0-4.8 2.1 2.4 0 0 0 0 4.8zm11.6 0a2.1 2.4 0 1 0 0-4.8 2.1 2.4 0 0 0 0 4.8zM9.6 7.8a2 2.4 0 1 0 0-4.8 2 2.4 0 0 0 0 4.8zm4.8 0a2 2.4 0 1 0 0-4.8 2 2.4 0 0 0 0 4.8zM12 11c-3.1 0-5.8 2.5-6.3 5.7-.3 2.1 1.2 4.3 3.4 4.3 1.2 0 2-.5 2.9-.5.9 0 1.7.5 2.9.5 2.2 0 3.7-2.2 3.4-4.3-.5-3.2-3.2-5.7-6.3-5.7z"/></symbol>
+            <symbol id="ic-ddg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.5 4.5 5.7v5.6c0 4.8 3.2 9.1 7.5 10.2 4.3-1.1 7.5-5.4 7.5-10.2V5.7L12 2.5zm0 3.6a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm0 11.2c-1.8 0-3.4-.9-4.3-2.3.9-1.2 2.6-1.8 4.3-1.8s3.4.6 4.3 1.8c-.9 1.4-2.5 2.3-4.3 2.3z"/></symbol>
+            <symbol id="ic-close" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></g></symbol>
+            <symbol id="ic-arrow-right" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></g></symbol>
+            <symbol id="ic-ext" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><line x1="10" y1="14" x2="20" y2="4"/><path d="M18 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/></g></symbol>
+            <symbol id="ic-chevron-up" viewBox="0 0 24 24"><polyline fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" points="6 15 12 9 18 15"/></symbol>
+            <symbol id="ic-play" viewBox="0 0 24 24"><path fill="currentColor" d="M8.2 5.4c-.7-.44-1.6.06-1.6.9v11.4c0 .84.9 1.34 1.6.9l9.2-5.7a1.05 1.05 0 0 0 0-1.8z"/></symbol>
+            <symbol id="ic-pause" viewBox="0 0 24 24"><path fill="currentColor" d="M7.5 5.5a1.5 1.5 0 0 1 3 0v13a1.5 1.5 0 0 1-3 0zm6 0a1.5 1.5 0 0 1 3 0v13a1.5 1.5 0 0 1-3 0z"/></symbol>
+            <symbol id="ic-prev" viewBox="0 0 24 24"><path fill="currentColor" d="M5.5 5.5a1 1 0 0 1 2 0v13a1 1 0 0 1-2 0zm12.3.5c.65-.42 1.5.04 1.5.82v10.36c0 .78-.85 1.24-1.5.82l-8.1-5.18a.97.97 0 0 1 0-1.64z"/></symbol>
+            <symbol id="ic-next" viewBox="0 0 24 24"><path fill="currentColor" d="M16.5 5.5a1 1 0 0 1 2 0v13a1 1 0 0 1-2 0zM6.2 6c-.65-.42-1.5.04-1.5.82v10.36c0 .78.85 1.24 1.5.82l8.1-5.18a.97.97 0 0 0 0-1.64z"/></symbol>
+            <symbol id="ic-shuffle" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></g></symbol>
+            <symbol id="ic-list" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="8" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.2" fill="currentColor" stroke="none"/></g></symbol>
+            <symbol id="ic-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="20" y1="20" x2="16" y2="16"/></g></symbol>
+            <symbol id="ic-calc" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2.5" width="16" height="19" rx="2.5"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="12" x2="10" y2="12"/><line x1="14" y1="12" x2="16" y2="12"/><line x1="8" y1="16.5" x2="10" y2="16.5"/><line x1="14" y1="16.5" x2="16" y2="16.5"/></g></symbol>
+            <symbol id="ic-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></g></symbol>
+            <symbol id="ic-rss" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1.5" fill="currentColor" stroke="none"/></g></symbol>
+            <symbol id="ic-image" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="m21 16-5-5-11 9"/></g></symbol>
+            <symbol id="ic-news" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h13a2 2 0 0 1 2 2v12H6a2 2 0 0 1-2-2V5z"/><path d="M19 9h2v8a2 2 0 0 1-2 2"/><line x1="8" y1="10" x2="15" y2="10"/><line x1="8" y1="14" x2="14" y2="14"/></g></symbol>
+            <symbol id="ic-disc" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/></g></symbol>
+            <symbol id="ic-theme" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path fill="currentColor" stroke="none" d="M12 3a9 9 0 0 1 0 18z"/></g></symbol>
+            <symbol id="ic-volume" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.8 5.2a9.5 9.5 0 0 1 0 13.6"/></g></symbol>
+            <symbol id="ic-radar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 4.9a10 10 0 0 0 0 14.2"/><path d="M19.1 4.9a10 10 0 0 1 0 14.2"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4"/><path d="M16.2 7.8a6 6 0 0 1 0 8.4"/><circle cx="12" cy="12" r="1.8" fill="currentColor" stroke="none"/></g></symbol>
+            <symbol id="ic-bilibili" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m8 4 3 3h2l3-3"/><rect x="3" y="7" width="18" height="13" rx="3.5"/><line x1="8.5" y1="12" x2="8.5" y2="14.5"/><line x1="15.5" y1="12" x2="15.5" y2="14.5"/></g></symbol>
+            <symbol id="ic-wechat" viewBox="0 0 24 24"><path fill="currentColor" d="M9.5 4C5.36 4 2 6.84 2 10.35c0 1.98 1.07 3.74 2.75 4.9l-.68 2.05 2.4-1.2c.96.26 1.98.4 3.03.4.32 0 .63-.02.94-.05A5.3 5.3 0 0 1 10 14.3c0-3.04 2.91-5.5 6.5-5.5.42 0 .83.04 1.23.1C16.95 6.08 13.56 4 9.5 4zm-2.3 4.8a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm4.6 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm4.7 1.2c-3.04 0-5.5 2.02-5.5 4.5s2.46 4.5 5.5 4.5c.72 0 1.4-.11 2.04-.32l1.86.92-.5-1.56c1.27-.9 2.1-2.16 2.1-3.54 0-2.48-2.46-4.5-5.5-4.5zm-1.9 3.6a.85.85 0 1 1 0-1.7.85.85 0 0 1 0 1.7zm3.8 0a.85.85 0 1 1 0-1.7.85.85 0 0 1 0 1.7z"/></symbol>
+            <symbol id="ic-bag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l1 12H5L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></g></symbol>
+            <symbol id="ic-tiktok" viewBox="0 0 24 24"><path fill="currentColor" d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5c-1.43 0-2.6-1.16-2.6-2.6 0-1.72 1.66-3.01 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64 0 3.14 2.55 5.7 5.7 5.7 3.15 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3s-1.88.09-3.24-1.48z"/></symbol>
+            <symbol id="ic-cube" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5 20.5 7.3v9.4L12 21.5l-8.5-4.8V7.3L12 2.5z"/><polyline points="3.5 7.3 12 12 20.5 7.3"/><line x1="12" y1="12" x2="12" y2="21.5"/></g></symbol>
+            <symbol id="ic-cloud" viewBox="0 0 24 24"><path fill="currentColor" d="M17.5 19H7a5 5 0 0 1-.5-9.98A6 6 0 0 1 18.2 10a4.5 4.5 0 0 1-.7 9z"/></symbol>
+            <symbol id="ic-youtube" viewBox="0 0 24 24"><path fill="currentColor" d="M21.58 7.19a2.75 2.75 0 0 0-1.94-1.95C17.93 4.78 12 4.78 12 4.78s-5.93 0-7.64.46A2.75 2.75 0 0 0 2.42 7.2 28.8 28.8 0 0 0 1.96 12a28.8 28.8 0 0 0 .46 4.81 2.75 2.75 0 0 0 1.94 1.95c1.71.46 7.64.46 7.64.46s5.93 0 7.64-.46a2.75 2.75 0 0 0 1.94-1.95c.31-1.59.46-3.2.46-4.81 0-1.61-.15-3.22-.46-4.81zM10 15V9l5.2 3-5.2 3z"/></symbol>
+        </defs>
+    </svg>
     <div id="preloader" aria-hidden="true">
         <div class="loader">
             <span class="loader-mark">L</span>
@@ -61,200 +127,338 @@
         </div>
     </div>
 
-    <header class="statusbar">
-        <div class="statusbar-inner">
-            <a class="brand" href="#top" aria-label="回到顶部">
-                <span class="brand-led" aria-hidden="true"></span>
-                <span class="brand-name">LOONG</span>
-                <span class="brand-sub">个人终端</span>
-            </a>
+    <div id="ambient-bg" class="ambient-bg" data-dayphase="day" aria-hidden="true">
+        <div class="ambient-orb orb-a"></div>
+        <div class="ambient-orb orb-b"></div>
+        <div class="ambient-orb orb-c"></div>
+        <div class="grain"></div>
+    </div>
 
-            <div class="statusbar-meta">
-                <div id="weather-status" class="status-chip" aria-live="polite">
-                    <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
-                    <span>正在获取天气...</span>
-                </div>
-                <time id="clock" class="clock">00:00:00</time>
+    <!-- 视口顶部渐进磨砂过渡层：让滚动卡片平滑融化在浮岛导航下方 -->
+    <div class="top-edge-blur" aria-hidden="true"></div>
+
+    <header class="topbar" id="top">
+        <div class="topbar-inner">
+            <div class="topbar-left">
+                <a class="brand magnetic" href="#top" aria-label="回到顶部">
+                    <span class="brand-led" aria-hidden="true"></span>
+                    <span class="brand-name">LOONG</span>
+                </a>
+
+                <button id="weather-btn" class="weather-pill magnetic" type="button" title="点击刷新天气" aria-label="刷新当前天气">
+                    <svg class="ui-icon weather-pin" aria-hidden="true"><use href="#ic-pin"></use></svg>
+                    <span id="weather-status">正在定位天气...</span>
+                    <svg class="ui-icon weather-sync" aria-hidden="true"><use href="#ic-refresh"></use></svg>
+                </button>
             </div>
 
-            <nav class="top-actions" aria-label="外部链接">
-                <a href="mailto:admin@885123.xyz" class="icon-link" aria-label="发送邮件" title="Email">
-                    <i class="fa-regular fa-envelope" aria-hidden="true"></i>
-                </a>
-                <a href="https://github.com/loong2004/my-nav-page" target="_blank" rel="noopener noreferrer" class="github-star-btn" title="给这个项目点个 Star">
-                    <i class="fab fa-github" aria-hidden="true"></i>
-                    <span>GitHub</span>
+            <div class="topbar-actions">
+                <button id="sound-toggle" class="dock-btn icon-only magnetic" type="button" aria-label="切换微交互音效" aria-pressed="true" title="开关微交互音效">
+                    <span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i></span>
+                </button>
+
+                <button id="theme-toggle" class="dock-btn icon-only magnetic" type="button" aria-label="切换明暗主题" title="切换明暗主题">
+                    <svg class="ui-icon theme-icon-sun" aria-hidden="true"><use href="#ic-sun"></use></svg>
+                    <svg class="ui-icon theme-icon-moon" aria-hidden="true"><use href="#ic-moon"></use></svg>
+                </button>
+
+                <a href="https://github.com/loong2004/my-nav-page" target="_blank" rel="noopener noreferrer" class="dock-btn github-star-btn magnetic" title="在 GitHub 查看源码并 Star">
+                    <svg class="ui-icon" aria-hidden="true"><use href="#ic-github"></use></svg>
+                    <span class="star-label">GitHub</span>
                     <span class="star-divider" aria-hidden="true"></span>
-                    <i class="fa-solid fa-star star-icon" aria-hidden="true"></i>
+                    <svg class="ui-icon star-icon" aria-hidden="true"><use href="#ic-star"></use></svg>
                     <span id="github-star-count" class="star-count">SYNC</span>
                 </a>
-            </nav>
+
+                <a href="https://t.me/loong2004" target="_blank" rel="noopener noreferrer" class="dock-btn icon-only magnetic" aria-label="Telegram" title="Telegram">
+                    <svg class="ui-icon" aria-hidden="true"><use href="#ic-telegram"></use></svg>
+                </a>
+
+                <a href="mailto:admin@885123.xyz" class="dock-btn icon-only magnetic" aria-label="发送邮件" title="Email">
+                    <svg class="ui-icon" aria-hidden="true"><use href="#ic-mail"></use></svg>
+                </a>
+            </div>
         </div>
     </header>
 
-    <main class="container">
-        <section class="hero" id="top" aria-labelledby="hero-title">
-          <div class="hero-main">
-            <div class="hero-id">
-                <span class="avatar">
-                    <img src="./avatar.jpg" alt="Loong 的头像" width="88" height="88">
-                    <span class="avatar-led" aria-hidden="true"></span>
-                </span>
-                <div class="hero-name">
-                    <h1 id="hero-title">Loong</h1>
-                    <p id="greeting" class="greeting">你好</p>
+    <main class="container bento-desk">
+        <!-- Row 1: Hero Omnibar (8 cols) + Chrono & Solar Dial (4 cols) -->
+        <section class="bento-card bento-hero" aria-labelledby="hero-title">
+            <!-- 独立玻璃背板层，避免形成 Backdrop Root 阻断下拉面板跨卡片折射 -->
+            <div class="card-glass" aria-hidden="true"></div>
+
+            <div class="hero-header">
+                <div class="hero-identity">
+                    <div class="hero-avatar-frame magnetic">
+                        <img src="./avatar.jpg" alt="Loong 的头像" width="72" height="72">
+                        <span class="hero-presence" aria-hidden="true"></span>
+                    </div>
+                    <div class="hero-titles">
+                        <h1 id="hero-title">Loong</h1>
+                        <p id="greeting" class="hero-greeting">下午好，喝杯茶提提神</p>
+                    </div>
+                </div>
+
+                <div class="quote-strip">
+                    <blockquote class="quote-body">
+                        <span class="quote-mark" aria-hidden="true">“</span>
+                        <p id="hitokoto_text" aria-live="polite">正在为你取一句话...</p>
+                    </blockquote>
+                    <div class="quote-actions">
+                        <button id="quote-refresh" class="quote-icon-btn" type="button" title="换一句" aria-label="换一句语录">
+                            <svg class="ui-icon" aria-hidden="true"><use href="#ic-refresh"></use></svg>
+                        </button>
+                        <button id="quote-copy" class="quote-icon-btn" type="button" title="复制语录" aria-label="复制当前语录">
+                            <svg class="ui-icon" aria-hidden="true"><use href="#ic-copy"></use></svg>
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <blockquote class="hitokoto">
-                <p id="hitokoto_text" aria-live="polite">正在为你取一句话...</p>
-            </blockquote>
-
-            <div class="search" role="search">
-                <div class="search-box">
-                    <div class="search-engine-selector" id="engine-selector">
-                        <div class="selected-engine" id="selected-engine" role="button" tabindex="0" aria-label="选择搜索引擎" aria-expanded="false" aria-controls="engine-options">
-                            <i class="fab fa-microsoft" id="current-engine-icon" aria-hidden="true"></i>
-                            <span class="engine-name" id="current-engine-name">Bing</span>
-                            <i class="fa-solid fa-chevron-down engine-chevron" aria-hidden="true"></i>
-                        </div>
-                        <div class="engine-options" id="engine-options" role="menu" aria-hidden="true">
-                            <div class="option" role="menuitem" tabindex="0" data-engine="google"><i class="fab fa-google"></i><span>Google</span></div>
-                            <div class="option" role="menuitem" tabindex="0" data-engine="baidu"><i class="fas fa-paw"></i><span>Baidu</span></div>
-                            <div class="option" role="menuitem" tabindex="0" data-engine="bing"><i class="fab fa-microsoft"></i><span>Bing</span></div>
-                            <div class="option" role="menuitem" tabindex="0" data-engine="duckduckgo"><i class="fas fa-shield-alt"></i><span>DuckDuckGo</span></div>
-                        </div>
+            <div class="omnibar-wrap" id="omnibar">
+                <div class="engine-bar">
+                    <div class="engine-tabs" id="engine-tabs" role="tablist" aria-label="选择搜索引擎">
+                        <span class="engine-glider" id="engine-glider" aria-hidden="true"><span class="glider-pill"></span></span>
+                        <button class="engine-tab" type="button" role="tab" data-engine="bing" aria-selected="true"><svg class="ui-icon" aria-hidden="true"><use href="#ic-bing"></use></svg><span>Bing</span></button>
+                        <button class="engine-tab" type="button" role="tab" data-engine="google" aria-selected="false"><svg class="ui-icon" aria-hidden="true"><use href="#ic-google"></use></svg><span>Google</span></button>
+                        <button class="engine-tab" type="button" role="tab" data-engine="baidu" aria-selected="false"><svg class="ui-icon" aria-hidden="true"><use href="#ic-baidu"></use></svg><span>Baidu</span></button>
+                        <button class="engine-tab" type="button" role="tab" data-engine="duckduckgo" aria-selected="false"><svg class="ui-icon" aria-hidden="true"><use href="#ic-ddg"></use></svg><span>DuckDuckGo</span></button>
                     </div>
-                    <input type="search" id="search-input" placeholder="搜索网络..." autofocus autocomplete="off" spellcheck="false" aria-label="搜索关键词">
-                    <button id="search-btn" type="button" aria-label="搜索">
-                        <span aria-hidden="true">↵</span>
+                </div>
+
+                <div class="search-anchor">
+                    <div class="search-box" id="search-box" role="search">
+                        <span class="search-engine-badge" aria-hidden="true">
+                            <svg class="ui-icon" id="current-engine-icon" aria-hidden="true"><use href="#ic-bing"></use></svg>
+                        </span>
+                        <input type="search" id="search-input" placeholder="搜索、算式，或输入 / 命令..." autofocus autocomplete="off" spellcheck="false" aria-label="搜索关键词、算式或命令" aria-expanded="false" aria-controls="omni-dropdown">
+                        <button id="search-clear" class="search-clear" type="button" aria-label="清空输入" hidden>
+                            <svg class="ui-icon" aria-hidden="true"><use href="#ic-close"></use></svg>
+                        </button>
+                        <button id="search-btn" class="search-submit" type="button" aria-label="执行搜索">
+                            <span aria-hidden="true">↵</span>
+                        </button>
+                    </div>
+
+                    <div class="omni-dropdown" id="omni-dropdown" role="listbox" aria-label="即时计算、命令与搜索历史" hidden></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="bento-card bento-chrono" id="clock-card" data-clock-mode="reel" aria-label="精密时钟与日照轨迹">
+            <div class="chrono-head">
+                <time id="readout-date" class="chrono-date">----.--.--</time>
+                <span id="readout-week" class="chrono-week">星期-</span>
+            </div>
+
+            <div id="clock-display" class="clock-display" role="button" tabindex="0" title="点击切换机械滚轮 / 数码管" aria-label="当前时间，点击切换表盘样式">
+                <div class="clock-reels" id="clock-reels" aria-hidden="true">
+                    <div class="reel" data-slot="0"><div class="reel-strip"></div></div>
+                    <div class="reel" data-slot="1"><div class="reel-strip"></div></div>
+                    <span class="reel-sep">:</span>
+                    <div class="reel" data-slot="2"><div class="reel-strip"></div></div>
+                    <div class="reel" data-slot="3"><div class="reel-strip"></div></div>
+                    <span class="reel-sep">:</span>
+                    <div class="reel" data-slot="4"><div class="reel-strip"></div></div>
+                    <div class="reel" data-slot="5"><div class="reel-strip"></div></div>
+                </div>
+                <time id="clock" class="clock-led">00:00:00</time>
+            </div>
+
+            <div class="solar-box">
+                <span id="solar-phase-label" class="solar-phase">白昼运转中</span>
+                <svg id="solar-dial" class="solar-dial" viewBox="0 0 280 94" role="img" aria-label="24小时日照轨迹，移动指针可预览任意时刻">
+                    <defs>
+                        <linearGradient id="solar-day-grad" x1="0" y1="0" x2="1" y2="0">
+                            <stop offset="0%" stop-color="var(--accent-2)"></stop>
+                            <stop offset="50%" stop-color="var(--accent)"></stop>
+                            <stop offset="100%" stop-color="var(--accent-2)"></stop>
+                        </linearGradient>
+                    </defs>
+                    <line class="solar-horizon" x1="12" y1="64" x2="268" y2="64"></line>
+                    <path id="solar-track-full" class="solar-track-full" fill="none"></path>
+                    <path id="solar-track-day" class="solar-track-day" fill="none" stroke="url(#solar-day-grad)"></path>
+                    <line id="solar-guide" class="solar-guide" x1="0" y1="10" x2="0" y2="88" opacity="0"></line>
+                    <g id="solar-orb" class="solar-orb">
+                        <circle class="orb-halo" r="10"></circle>
+                        <circle class="orb-core" r="4.5"></circle>
+                    </g>
+                    <text x="16" y="77" class="solar-tick">00</text>
+                    <text x="78" y="77" class="solar-tick">06</text>
+                    <text x="140" y="77" class="solar-tick">12</text>
+                    <text x="202" y="77" class="solar-tick">18</text>
+                    <text x="264" y="77" class="solar-tick">24</text>
+                </svg>
+            </div>
+
+            <div class="chrono-foot">
+                <span id="day-pct" class="chrono-val">今日 0%</span>
+                <div class="meter-bar" aria-hidden="true"><span id="day-meter-fill"></span></div>
+                <span class="chrono-year">第 <b id="year-day">---</b> 天 · <span id="year-pct">0%</span></span>
+            </div>
+        </section>
+
+        <!-- Row 2: 3 Tactile 3D Portal Cards -->
+        <section class="portal-row" aria-label="快捷入口">
+            <a href="https://monki.de5.net" target="_blank" rel="noopener noreferrer" class="bento-card portal-card" data-portal-url="https://monki.de5.net">
+                <div class="portal-glare" aria-hidden="true"></div>
+                <svg class="portal-art art-blog" viewBox="0 0 120 120" aria-hidden="true">
+                    <rect x="24" y="22" width="72" height="10" rx="5"></rect>
+                    <rect x="24" y="44" width="54" height="8" rx="4"></rect>
+                    <rect x="24" y="64" width="66" height="8" rx="4"></rect>
+                    <rect x="24" y="84" width="40" height="8" rx="4"></rect>
+                </svg>
+                <div class="portal-top">
+                    <span class="portal-url">monki.de5.net</span>
+                    <span class="portal-ping" data-ping-status="pending">
+                        <i class="ping-dot" aria-hidden="true"></i>
+                        <span class="ping-text">检测中</span>
+                    </span>
+                </div>
+                <div class="portal-body">
+                    <div class="portal-title-row">
+                        <h2>个人博客</h2>
+                        <svg class="ui-icon portal-arrow" aria-hidden="true"><use href="#ic-arrow-right"></use></svg>
+                    </div>
+                    <p class="portal-desc">技术笔记、折腾记录与碎碎念</p>
+                </div>
+            </a>
+
+            <a href="https://pic.soomin.de5.net" target="_blank" rel="noopener noreferrer" class="bento-card portal-card" data-portal-url="https://pic.soomin.de5.net">
+                <div class="portal-glare" aria-hidden="true"></div>
+                <svg class="portal-art art-pic" viewBox="0 0 120 120" aria-hidden="true">
+                    <circle cx="60" cy="60" r="38" fill="none" stroke-width="2"></circle>
+                    <circle cx="60" cy="60" r="18" fill="none" stroke-width="2"></circle>
+                    <line x1="60" y1="14" x2="60" y2="34" stroke-width="2"></line>
+                    <line x1="60" y1="86" x2="60" y2="106" stroke-width="2"></line>
+                    <line x1="14" y1="60" x2="34" y2="60" stroke-width="2"></line>
+                    <line x1="86" y1="60" x2="106" y2="60" stroke-width="2"></line>
+                </svg>
+                <div class="portal-top">
+                    <span class="portal-url">pic.soomin.de5.net</span>
+                    <span class="portal-ping" data-ping-status="pending">
+                        <i class="ping-dot" aria-hidden="true"></i>
+                        <span class="ping-text">检测中</span>
+                    </span>
+                </div>
+                <div class="portal-body">
+                    <div class="portal-title-row">
+                        <h2>个人图床</h2>
+                        <svg class="ui-icon portal-arrow" aria-hidden="true"><use href="#ic-arrow-right"></use></svg>
+                    </div>
+                    <p class="portal-desc">高速媒体托管与灵感影像库</p>
+                </div>
+            </a>
+
+            <a href="https://news.885123.xyz" target="_blank" rel="noopener noreferrer" class="bento-card portal-card" data-portal-url="https://news.885123.xyz">
+                <div class="portal-glare" aria-hidden="true"></div>
+                <svg class="portal-art art-news" viewBox="0 0 120 120" aria-hidden="true">
+                    <circle cx="60" cy="60" r="12"></circle>
+                    <circle class="pulse-ring r1" cx="60" cy="60" r="26" fill="none" stroke-width="2"></circle>
+                    <circle class="pulse-ring r2" cx="60" cy="60" r="42" fill="none" stroke-width="1.5"></circle>
+                </svg>
+                <div class="portal-top">
+                    <span class="portal-url">news.885123.xyz</span>
+                    <span class="portal-ping" data-ping-status="pending">
+                        <i class="ping-dot" aria-hidden="true"></i>
+                        <span class="ping-text">检测中</span>
+                    </span>
+                </div>
+                <div class="portal-body">
+                    <div class="portal-title-row">
+                        <h2>每日热点</h2>
+                        <svg class="ui-icon portal-arrow" aria-hidden="true"><use href="#ic-arrow-right"></use></svg>
+                    </div>
+                    <p class="portal-desc">全网资讯聚合与今日风向标</p>
+                </div>
+            </a>
+        </section>
+
+        <!-- Row 3: Turntable Audio Deck (5 cols) + Interactive GitHub Matrix (7 cols) -->
+        <aside id="neon-player" class="bento-card bento-audio np" aria-label="黑胶音乐台"
+            data-api="https://api.injahow.cn/meting/"
+            data-server="netease"
+            data-type="playlist"
+            data-id="24381616"></aside>
+
+        <section class="bento-card bento-github" id="contrib" data-user="loong2004" aria-labelledby="github-title">
+            <div class="card-head">
+                <h2 id="github-title" class="card-title">代码足迹</h2>
+                <a href="https://github.com/loong2004" target="_blank" rel="noopener noreferrer" class="gh-handle">
+                    @loong2004 <svg class="ui-icon" aria-hidden="true"><use href="#ic-ext"></use></svg>
+                </a>
+            </div>
+
+            <div class="contrib-stage">
+                <div class="contrib-tooltip" id="contrib-tooltip" aria-hidden="true"></div>
+                <div class="contrib-scroll">
+                    <div class="contrib-grid" id="contrib-grid" role="img" aria-label="过去一年的 GitHub 提交矩阵"></div>
+                </div>
+            </div>
+
+            <div class="contrib-foot">
+                <span id="contrib-total" class="contrib-note">正在同步提交矩阵...</span>
+                <div class="contrib-legend" role="group" aria-label="按活跃度筛选">
+                    <span class="legend-text">少</span>
+                    <button type="button" class="legend-swatch" data-l="0" data-filter="0" title="筛选无提交日" aria-pressed="false"></button>
+                    <button type="button" class="legend-swatch" data-l="1" data-filter="1" title="筛选低活跃日" aria-pressed="false"></button>
+                    <button type="button" class="legend-swatch" data-l="2" data-filter="2" title="筛选中活跃日" aria-pressed="false"></button>
+                    <button type="button" class="legend-swatch" data-l="3" data-filter="3" title="筛选高活跃日" aria-pressed="false"></button>
+                    <button type="button" class="legend-swatch" data-l="4" data-filter="4" title="筛选极高活跃日" aria-pressed="false"></button>
+                    <span class="legend-text">多</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Row 4: Network Status (12 cols) -->
+        <section class="bento-card bento-network network-section" id="network-section" aria-labelledby="network-title-text">
+            <div class="network-head">
+                <div class="network-title-row">
+                    <h2 id="network-title-text" class="card-title">网络状态</h2>
+                    <span id="network-summary" class="network-summary" aria-live="polite">8 个节点待检测</span>
+                </div>
+
+                <div class="network-controls">
+                    <div class="net-filter-tabs" id="net-filter-tabs" role="tablist" aria-label="节点区域筛选">
+                        <span class="net-glider" id="net-glider" aria-hidden="true"><span class="glider-pill"></span></span>
+                        <button class="net-tab is-active" type="button" role="tab" data-region="all" aria-selected="true">全部</button>
+                        <button class="net-tab" type="button" role="tab" data-region="国内" aria-selected="false">国内</button>
+                        <button class="net-tab" type="button" role="tab" data-region="国际" aria-selected="false">国际</button>
+                    </div>
+
+                    <button id="net-rescan" class="icon-circle-btn" type="button" title="重新探测所有节点" aria-label="重新探测所有节点">
+                        <svg class="ui-icon" aria-hidden="true"><use href="#ic-refresh"></use></svg>
+                    </button>
+
+                    <button id="network-toggle" class="network-toggle" type="button" aria-expanded="true" aria-controls="network-grid">
+                        <span>收起</span>
+                        <svg class="ui-icon" aria-hidden="true"><use href="#ic-chevron-up"></use></svg>
                     </button>
                 </div>
-                <p class="search-hints">
-                    <span><kbd>/</kbd> 聚焦搜索</span>
-                    <span><kbd>↑</kbd><kbd>↓</kbd> 切换引擎</span>
-                    <span><kbd>/blog</kbd><kbd>/pic</kbd><kbd>/news</kbd> 直达站点</span>
-                </p>
             </div>
-          </div>
 
-            <aside class="readout" aria-label="今日读数">
-                <div class="readout-date">
-                    <span class="readout-label">今日</span>
-                    <time class="readout-value" id="readout-date">----.--.--</time>
-                    <span class="readout-sub" id="readout-week">星期-</span>
-                </div>
-                <div class="readout-meter">
-                    <div class="readout-meter-head">
-                        <span>今天已过去</span>
-                        <span class="readout-pct" id="day-pct">--%</span>
-                    </div>
-                    <div class="meter" id="day-meter" aria-hidden="true"></div>
-                </div>
-                <div class="readout-meter">
-                    <div class="readout-meter-head">
-                        <span>今年第 <b id="year-day">---</b> 天</span>
-                        <span class="readout-pct" id="year-pct">--%</span>
-                    </div>
-                    <div class="meter" id="year-meter" aria-hidden="true"></div>
-                </div>
-            </aside>
-        </section>
-
-        <section class="block" aria-labelledby="links-title">
-            <header class="block-head">
-                <span class="block-no">01</span>
-                <h2 id="links-title">快捷入口</h2>
-                <span class="block-meta">3 个站点</span>
-            </header>
-
-            <div class="cards-grid">
-                <a href="https://monki.de5.net" target="_blank" rel="noopener noreferrer" class="card">
-                    <span class="card-top">
-                        <span class="card-cmd">/blog</span>
-                        <i class="fas fa-rss card-icon" aria-hidden="true"></i>
-                    </span>
-                    <span class="card-title">个人博客</span>
-                    <span class="card-url">monki.de5.net</span>
-                    <i class="fa-solid fa-arrow-right card-arrow" aria-hidden="true"></i>
-                </a>
-                <a href="https://pic.soomin.de5.net" target="_blank" rel="noopener noreferrer" class="card">
-                    <span class="card-top">
-                        <span class="card-cmd">/pic</span>
-                        <i class="far fa-image card-icon" aria-hidden="true"></i>
-                    </span>
-                    <span class="card-title">个人图床</span>
-                    <span class="card-url">pic.soomin.de5.net</span>
-                    <i class="fa-solid fa-arrow-right card-arrow" aria-hidden="true"></i>
-                </a>
-                <a href="https://news.885123.xyz" target="_blank" rel="noopener noreferrer" class="card">
-                    <span class="card-top">
-                        <span class="card-cmd">/news</span>
-                        <i class="far fa-newspaper card-icon" aria-hidden="true"></i>
-                    </span>
-                    <span class="card-title">每日热点</span>
-                    <span class="card-url">news.885123.xyz</span>
-                    <i class="fa-solid fa-arrow-right card-arrow" aria-hidden="true"></i>
-                </a>
-            </div>
-        </section>
-
-        <section class="block" aria-labelledby="github-title">
-            <header class="block-head">
-                <span class="block-no">02</span>
-                <h2 id="github-title">代码足迹</h2>
-                <a href="https://github.com/loong2004" target="_blank" rel="noopener noreferrer" class="block-meta text-link">
-                    @loong2004 <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
-                </a>
-            </header>
-
-            <div class="contrib" id="contrib" data-user="loong2004">
-                <div class="contrib-scroll">
-                    <div class="contrib-grid" id="contrib-grid" role="img" aria-label="过去一年的 GitHub 提交分布"></div>
-                </div>
-                <div class="contrib-foot">
-                    <span id="contrib-total">正在读取提交记录...</span>
-                    <span class="contrib-legend" aria-hidden="true">
-                        少 <i data-l="0"></i><i data-l="1"></i><i data-l="2"></i><i data-l="3"></i><i data-l="4"></i> 多
-                    </span>
-                </div>
-            </div>
-        </section>
-
-        <section class="block network-section" id="network-section" aria-labelledby="network-title-text">
-            <header class="block-head">
-                <span class="block-no">03</span>
-                <h2 id="network-title-text">网络状态</h2>
-                <span id="network-summary" class="block-meta" aria-live="polite">8 个节点待检测</span>
-                <button id="network-toggle" class="network-toggle" type="button" aria-expanded="true" aria-controls="network-grid">
-                    <span>收起</span>
-                    <i class="fas fa-chevron-up" aria-hidden="true"></i>
-                </button>
-            </header>
             <div class="connectivity-grid" id="network-grid"></div>
         </section>
-
-        <footer class="footer">
-            <div class="footer-links">
-                <a href="https://github.com/loong2004" target="_blank" rel="noopener noreferrer" class="footer-icon-link" aria-label="GitHub" title="GitHub">
-                    <i class="fab fa-github" aria-hidden="true"></i>
-                </a>
-                <a href="https://t.me/loong2004" target="_blank" rel="noopener noreferrer" class="footer-icon-link" aria-label="Telegram" title="Telegram">
-                    <i class="fab fa-telegram" aria-hidden="true"></i>
-                </a>
-                <a href="mailto:admin@885123.xyz" class="footer-icon-link" aria-label="Email" title="Email">
-                    <i class="fa-regular fa-envelope" aria-hidden="true"></i>
-                </a>
-            </div>
-        </footer>
     </main>
 
-    <!-- 音乐播放器：修改 data-id 即可换歌单，data-server 支持 netease / tencent 等 Meting 支持的平台 -->
-    <aside id="neon-player" class="np" aria-label="音乐播放器"
-        data-api="https://api.injahow.cn/meting/"
-        data-server="netease"
-        data-type="playlist"
-        data-id="24381616"></aside>
+    <!-- Floating Dynamic Mini-Island when Turntable card scrolls out of view -->
+    <div id="music-island" class="music-island" aria-hidden="true" aria-label="迷你音乐浮岛">
+        <button id="island-jump" class="island-disc-btn" type="button" title="回到黑胶唱机" aria-label="滚动回到黑胶唱机">
+            <img id="island-cover" src="./avatar.jpg" alt="" decoding="async">
+        </button>
+        <div class="island-copy">
+            <span id="island-title" class="island-title">黑胶唱机</span>
+            <span id="island-sub" class="island-sub">等待播放</span>
+        </div>
+        <div class="island-actions">
+            <button id="island-play" class="island-btn is-primary" type="button" aria-label="播放或暂停" title="播放 / 暂停">
+                <svg class="ui-icon" aria-hidden="true"><use href="#ic-play"></use></svg>
+            </button>
+            <button id="island-next" class="island-btn" type="button" aria-label="下一首" title="下一首">
+                <svg class="ui-icon" aria-hidden="true"><use href="#ic-next"></use></svg>
+            </button>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
